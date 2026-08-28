@@ -6,7 +6,7 @@
     <title>Rescue Vital & GCS - เครื่องมือกู้ชีพ</title>
     <style>
         * { box-sizing: border-box; font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; }
-        body { background-color: #f0f2f5; margin: 0; padding: 12px; display: flex; justify-content: center; }
+        body { background-color: #f0f2f5; margin: 0; padding: 12px; display: flex; justify-content: center; position: relative; }
         .main-container { width: 100%; max-width: 450px; }
         
         /* Navigation Tabs Header */
@@ -89,9 +89,36 @@
             font-weight: bold;
             letter-spacing: 0.5px;
         }
+
+        /* In-App Toast Popup Style */
+        .toast-popup {
+            position: fixed;
+            top: 20px;
+            left: 50%;
+            transform: translateX(-50%) translateY(-20px);
+            background: rgba(30, 41, 59, 0.92);
+            color: #ffffff;
+            padding: 12px 24px;
+            border-radius: 25px;
+            font-size: 14px;
+            font-weight: bold;
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.2);
+            backdrop-filter: blur(5px);
+            z-index: 9999;
+            opacity: 0;
+            pointer-events: none;
+            transition: all 0.4s ease;
+        }
+
+        .toast-popup.show {
+            opacity: 1;
+            transform: translateX(-50%) translateY(0);
+        }
     </style>
 </head>
 <body>
+
+<div id="toastPopup" class="toast-popup">✨ Made By Arsanamai</div>
 
 <div class="main-container">
     <div class="app-header">
@@ -205,14 +232,18 @@
         <button class="btn-copy" id="copyBtn" onclick="copyResult()">📋 ก๊อปปี้รายงานผล</button>
     </div>
 
-    <!-- Watermark Footer -->
     <div class="watermark">จัดทําเเอพโดย อาสาหน้าใหม่</div>
 </div>
 
 <script>
-    // Pop-up แจ้งเตือนเมื่อเปิดหน้าเว็บ
+    // แสดง Pop-up เด้งแบบนุ่มนวล และจางหายไปเองอัตโนมัติ (2.5 วินาที)
     window.onload = function() {
-        alert("Made By Arsanamai");
+        const toast = document.getElementById('toastPopup');
+        toast.classList.add('show');
+        
+        setTimeout(() => {
+            toast.classList.remove('show');
+        }, 2500);
     };
 
     // --- System Switching Logic ---
@@ -402,4 +433,3 @@
 
 </body>
 </html>
-
