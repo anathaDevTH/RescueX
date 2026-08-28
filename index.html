@@ -1,0 +1,386 @@
+<!DOCTYPE html>
+<html lang="th">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Rescue Vital & GCS - เครื่องมือกู้ชีพ</title>
+    <style>
+        * { box-sizing: border-box; font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; }
+        body { background-color: #f0f2f5; margin: 0; padding: 12px; display: flex; justify-content: center; }
+        .main-container { width: 100%; max-width: 450px; }
+        
+        /* Navigation Tabs Header */
+        .app-header {
+            display: flex; background: #ffffff; border-radius: 12px; padding: 6px;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.08); margin-bottom: 12px;
+        }
+        .tab-btn {
+            flex: 1; padding: 10px 4px; border: none; background: transparent;
+            font-size: 14px; font-weight: bold; color: #5f6368; border-radius: 8px;
+            cursor: pointer; transition: 0.2s;
+        }
+        .tab-btn.active { background: #1a73e8; color: white; }
+
+        /* Card Container */
+        .card { background: white; border-radius: 16px; padding: 18px; box-shadow: 0 4px 12px rgba(0,0,0,0.1); text-align: center; }
+        h2 { margin-top: 0; color: #1a73e8; font-size: 18px; margin-bottom: 15px; }
+
+        /* Component Styles */
+        .section-label { font-size: 13px; font-weight: bold; color: #5f6368; text-align: left; margin-bottom: 5px; margin-top: 10px; }
+        .btn-group { display: flex; gap: 6px; margin-bottom: 12px; }
+        .opt-btn { 
+            flex: 1; padding: 8px 4px; font-size: 13px; font-weight: bold; border: 1px solid #dadce0; 
+            background: #f8f9fa; color: #3c4043; border-radius: 8px; cursor: pointer; 
+        }
+        .opt-btn.active { background: #e8f0fe; color: #1a73e8; border-color: #1a73e8; }
+
+        .timer-display { font-size: 38px; font-weight: bold; color: #d93025; margin: 8px 0; }
+        
+        .start-btn {
+            width: 100%; padding: 14px; font-size: 16px; font-weight: bold; color: white;
+            background: #28a745; border: none; border-radius: 10px; cursor: pointer;
+            box-shadow: 0 4px 6px rgba(0,0,0,0.1); margin-bottom: 10px;
+        }
+        .start-btn:active { background: #218838; transform: scale(0.98); }
+        .start-btn:disabled { background: #a5d6a7; cursor: not-allowed; }
+
+        .tap-btn { 
+            width: 100%; height: 100px; font-size: 20px; font-weight: bold; color: white; 
+            background: #1a73e8; border: none; border-radius: 12px; cursor: pointer; 
+            box-shadow: 0 4px 6px rgba(0,0,0,0.15); margin-bottom: 10px; -webkit-tap-highlight-color: transparent;
+        }
+        .tap-btn:active { background: #1557b0; transform: scale(0.98); }
+        .tap-btn:disabled { background: #e0e0e0; color: #9e9e9e; cursor: not-allowed; box-shadow: none; }
+
+        .reset-btn {
+            background: #f1f3f4; color: #3c4043; border: none; padding: 8px 16px;
+            border-radius: 20px; font-weight: bold; cursor: pointer; margin-bottom: 15px;
+        }
+
+        .result-box { 
+            background: #f8f9fa; border: 1px solid #dadce0; border-radius: 10px; padding: 12px; margin-top: 10px; text-align: left;
+        }
+        .result-item { display: flex; justify-content: space-between; margin-bottom: 6px; font-size: 14px; color: #3c4043; }
+        .result-main { font-size: 18px; font-weight: bold; color: #1a73e8; border-top: 1px solid #dadce0; padding-top: 8px; margin-top: 8px; }
+
+        .status-alert {
+            display: none; margin-top: 10px; padding: 10px; border-radius: 8px;
+            font-size: 14px; font-weight: bold; text-align: center;
+        }
+        .status-normal { background-color: #d4edda; color: #155724; border: 1px solid #c3e6cb; }
+        .status-slow { background-color: #ffe8cc; color: #d9480f; border: 1px solid #ffd8a8; }
+        .status-fast { background-color: #f8d7da; color: #721c24; border: 1px solid #f5c6cb; }
+
+        /* Form Inputs (GCS) */
+        label { font-weight: bold; display: block; margin-top: 10px; text-align: left; font-size: 13px; color: #3c4043; }
+        select, input[type="text"], input[type="number"] { 
+            width: 100%; padding: 10px; margin-top: 4px; border: 1px solid #ccc; border-radius: 8px; box-sizing: border-box; font-size: 14px; 
+        }
+        .score { font-size: 22px; font-weight: bold; color: #0275d8; margin-top: 5px; }
+        .btn-copy { width: 100%; padding: 12px; background: #0275d8; color: white; border: none; border-radius: 8px; font-size: 16px; font-weight: bold; margin-top: 15px; cursor: pointer; }
+        .btn-copy:active { background: #014c8c; }
+    </style>
+</head>
+<body>
+
+<div class="main-container">
+    <div class="app-header">
+        <button class="tab-btn active" id="tabRRBtn" onclick="showTab('rr')">🫁 นับการหายใจ (RR)</button>
+        <button class="tab-btn" id="tabGCSBtn" onclick="showTab('gcs')">🧠 คำนวณ GCS (EVM)</button>
+    </div>
+
+    <div id="rrTab" class="card">
+        <h2>RR Counter Pro - อัตราการหายใจ</h2>
+        
+        <div class="section-label">กลุ่มผู้ป่วย:</div>
+        <div class="btn-group">
+            <button class="opt-btn active" id="modeAdult" onclick="setMode('adult')">ผู้ใหญ่</button>
+            <button class="opt-btn" id="modeChild" onclick="setMode('child')">เด็ก (1-12ปี)</button>
+            <button class="opt-btn" id="modeInfant" onclick="setMode('infant')">ทารก (<1ปี)</button>
+        </div>
+
+        <div class="section-label">ระยะเวลาที่นับ:</div>
+        <div class="btn-group">
+            <button class="opt-btn" id="time15" onclick="setTimeMode(15)">15 วิ (x4)</button>
+            <button class="opt-btn active" id="time30" onclick="setTimeMode(30)">30 วิ (x2)</button>
+            <button class="opt-btn" id="time60" onclick="setTimeMode(60)">60 วิ (x1)</button>
+        </div>
+
+        <div class="timer-display" id="timer">30.0s</div>
+        
+        <button class="start-btn" id="startBtn" onclick="startTimer()">▶ เริ่มจับเวลา</button>
+
+        <button class="tap-btn" id="tapBtn" onclick="registerTap()" disabled>
+            แตะที่นี่ตามจังหวะหายใจ<br>
+            <span style="font-size: 14px; font-weight: normal;">(นับได้: <span id="tapCount">0</span> ครั้ง)</span>
+        </button>
+        <br>
+        
+        <button class="reset-btn" onclick="resetAll()">↺ รีเซ็ต / เริ่มใหม่</button>
+
+        <div class="result-box">
+            <div class="result-item">
+                <span>นับสดได้:</span>
+                <strong id="rawCount">- ครั้ง</strong>
+            </div>
+            <div class="result-item">
+                <span>การคำนวณ:</span>
+                <strong id="calcText">-</strong>
+            </div>
+            <div class="result-item result-main">
+                <span>อัตราการหายใจ (RR):</span>
+                <span id="finalRR">- ครั้ง/นาที</span>
+            </div>
+
+            <div id="statusAlert" class="status-alert"></div>
+        </div>
+    </div>
+
+    <div id="gcsTab" class="card" style="display: none;">
+        <h2 style="color: #d9534f;">EVM / GCS Calculator</h2>
+
+        <label>ชื่อผู้ป่วย / รหัสเคส (ถ้ามี):</label>
+        <input type="text" id="patientName" placeholder="ระบุชื่อหรือรหัสเคส" oninput="updateResult()">
+
+        <div class="btn-group" style="margin-top: 12px;">
+            <button class="opt-btn active" id="btnText" onclick="switchGcsMode('text')">เลือกข้อความ</button>
+            <button class="opt-btn" id="btnManual" onclick="switchGcsMode('manual')">กรอกตัวเลข</button>
+        </div>
+
+        <div id="textMode">
+            <label>Eye Opening (E - การลืมตา):</label>
+            <select id="e_text" onchange="calculateText()">
+                <option value="4">E4 - ลืมตาได้เอง</option>
+                <option value="3">E3 - ลืมตาเมื่อเรียก</option>
+                <option value="2">E2 - ลืมตาเมื่อเจ็บ</option>
+                <option value="1">E1 - ไม่ตอบสนอง / ตาไม่เปิด</option>
+            </select>
+
+            <label>Verbal Response (V - การพูดคุย):</label>
+            <select id="v_text" onchange="calculateText()">
+                <option value="5">V5 - พูดคุยรู้เรื่อง ไม่สับสน</option>
+                <option value="4">V4 - พูดคุยได้แต่สับสน</option>
+                <option value="3">V3 - พูดเป็นคำๆ ไม่เป็นประโยค</option>
+                <option value="2">V2 - ส่งเสียงอืออา ไม่เป็นคำพูด</option>
+                <option value="1">V1 - ไม่ส่งเสียงใดๆ</option>
+            </select>
+
+            <label>Motor Response (M - การเคลื่อนไหว):</label>
+            <select id="m_text" onchange="calculateText()">
+                <option value="6">M6 - ทำตามคำสั่งได้ถูกต้อง</option>
+                <option value="5">M5 - ทราบตำแหน่งที่เจ็บ (Localize pain)</option>
+                <option value="4">M4 - ชักแขนขาหนีความเจ็บ (Withdrawal)</option>
+                <option value="3">M3 - แขนงอผิดปกติ (Decorticate)</option>
+                <option value="2">M2 - แขนเหยียดเกร็ง (Decerebrate)</option>
+                <option value="1">M1 - ไม่ตอบสนองใดๆ</option>
+            </select>
+        </div>
+
+        <div id="manualMode" style="display: none;">
+            <label>E Score (1-4):</label>
+            <input type="number" id="e_num" min="1" max="4" value="4" oninput="calculateManual()">
+
+            <label>V Score (1-5):</label>
+            <input type="number" id="v_num" min="1" max="5" value="5" oninput="calculateManual()">
+
+            <label>M Score (1-6):</label>
+            <input type="number" id="m_num" min="1" max="6" value="6" oninput="calculateManual()">
+        </div>
+
+        <div class="result-box" style="text-align: center;">
+            <div>ค่าคะแนนแยก: <span id="breakdown" style="font-weight: bold;">E4 V5 M6</span></div>
+            <div class="score">คะแนนรวม: <span id="totalScore">15</span> / 15</div>
+        </div>
+
+        <button class="btn-copy" id="copyBtn" onclick="copyResult()">📋 ก๊อปปี้รายงานผล</button>
+    </div>
+</div>
+
+<script>
+    // --- System Switching Logic ---
+    function showTab(tab) {
+        document.getElementById('rrTab').style.display = tab === 'rr' ? 'block' : 'none';
+        document.getElementById('gcsTab').style.display = tab === 'gcs' ? 'block' : 'none';
+        
+        document.getElementById('tabRRBtn').className = `tab-btn ${tab === 'rr' ? 'active' : ''}`;
+        document.getElementById('tabGCSBtn').className = `tab-btn ${tab === 'gcs' ? 'active' : ''}`;
+    }
+
+    // --- RR Counter Logic ---
+    let count = 0;
+    let selectedTime = 30;
+    let selectedMode = 'adult';
+    let timeLeft = 30.0;
+    let timerInterval = null;
+    let isRunning = false;
+
+    const audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+
+    function playSound(freq, duration) {
+        if (audioCtx.state === 'suspended') {
+            audioCtx.resume();
+        }
+        let osc = audioCtx.createOscillator();
+        let gain = audioCtx.createGain();
+        osc.type = 'sine';
+        osc.frequency.value = freq;
+        gain.gain.setValueAtTime(0.1, audioCtx.currentTime);
+        osc.connect(gain);
+        gain.connect(audioCtx.destination);
+        osc.start();
+        osc.stop(audioCtx.currentTime + duration);
+    }
+
+    function setMode(mode) {
+        if (isRunning) return;
+        selectedMode = mode;
+        document.querySelectorAll('#modeAdult, #modeChild, #modeInfant').forEach(b => b.classList.remove('active'));
+        if(mode === 'adult') document.getElementById('modeAdult').classList.add('active');
+        if(mode === 'child') document.getElementById('modeChild').classList.add('active');
+        if(mode === 'infant') document.getElementById('modeInfant').classList.add('active');
+    }
+
+    function setTimeMode(seconds) {
+        if (isRunning) return;
+        selectedTime = seconds;
+        timeLeft = seconds;
+        document.getElementById('timer').innerText = `${seconds.toFixed(1)}s`;
+        document.querySelectorAll('#time15, #time30, #time60').forEach(b => b.classList.remove('active'));
+        if(seconds === 15) document.getElementById('time15').classList.add('active');
+        if(seconds === 30) document.getElementById('time30').classList.add('active');
+        if(seconds === 60) document.getElementById('time60').classList.add('active');
+    }
+
+    function startTimer() {
+        if (isRunning) return;
+        isRunning = true;
+        document.getElementById('startBtn').disabled = true;
+        document.getElementById('tapBtn').disabled = false;
+        
+        let startTime = Date.now();
+        let totalDuration = selectedTime * 1000;
+
+        timerInterval = setInterval(() => {
+            let elapsed = Date.now() - startTime;
+            let remaining = Math.max(0, totalDuration - elapsed);
+            timeLeft = (remaining / 1000).toFixed(1);
+            document.getElementById('timer').innerText = `${timeLeft}s`;
+
+            if (remaining <= 0) {
+                finishCounting();
+            }
+        }, 100);
+    }
+
+    function registerTap() {
+        if (isRunning && timeLeft > 0) {
+            count++;
+            document.getElementById('tapCount').innerText = count;
+            playSound(600, 0.05);
+        }
+    }
+
+    function finishCounting() {
+        clearInterval(timerInterval);
+        isRunning = false;
+        document.getElementById('tapBtn').disabled = true;
+        document.getElementById('timer').innerText = "หมดเวลา!";
+        playSound(880, 0.4);
+
+        let multiplier = 60 / selectedTime;
+        let finalValue = count * multiplier;
+        
+        document.getElementById('rawCount').innerText = `${count} ครั้งใน ${selectedTime}s`;
+        document.getElementById('calcText').innerText = `${count} × ${multiplier} (x${multiplier} แล้ว)`;
+        document.getElementById('finalRR').innerText = `${finalValue} ครั้ง/นาที`;
+
+        evaluateRR(finalValue);
+    }
+
+    function evaluateRR(rr) {
+        let alertBox = document.getElementById('statusAlert');
+        alertBox.style.display = "block";
+        alertBox.className = "status-alert";
+
+        let minNormal = 12, maxNormal = 20;
+        if (selectedMode === 'child') { minNormal = 18; maxNormal = 30; }
+        else if (selectedMode === 'infant') { minNormal = 30; maxNormal = 50; }
+
+        if (rr < minNormal) {
+            alertBox.classList.add("status-slow");
+            alertBox.innerText = "🟠 หายใจช้ากว่าปกติ (Bradypnea)";
+        } else if (rr >= minNormal && rr <= maxNormal) {
+            alertBox.classList.add("status-normal");
+            alertBox.innerText = "🟢 อัตราการหายใจปกติ (Normal)";
+        } else {
+            alertBox.classList.add("status-fast");
+            alertBox.innerText = "🔴 หายใจเร็วผิดปกติ / หอบ (Tachypnea)";
+        }
+    }
+
+    function resetAll() {
+        clearInterval(timerInterval);
+        count = 0;
+        timeLeft = selectedTime;
+        isRunning = false;
+        
+        document.getElementById('timer').innerText = `${selectedTime.toFixed(1)}s`;
+        document.getElementById('tapCount').innerText = "0";
+        document.getElementById('rawCount').innerText = "- ครั้ง";
+        document.getElementById('calcText').innerText = "-";
+        document.getElementById('finalRR').innerText = "- ครั้ง/นาที";
+        
+        document.getElementById('statusAlert').style.display = "none";
+        document.getElementById('startBtn').disabled = false;
+        document.getElementById('tapBtn').disabled = true;
+    }
+
+    // --- GCS Logic ---
+    let currentE = 4, currentV = 5, currentM = 6, currentTotal = 15;
+
+    function switchGcsMode(mode) {
+        document.getElementById('textMode').style.display = mode === 'text' ? 'block' : 'none';
+        document.getElementById('manualMode').style.display = mode === 'manual' ? 'block' : 'none';
+        
+        document.getElementById('btnText').classList.toggle('active', mode === 'text');
+        document.getElementById('btnManual').classList.toggle('active', mode === 'manual');
+        
+        if (mode === 'text') calculateText();
+        else calculateManual();
+    }
+
+    function calculateText() {
+        currentE = parseInt(document.getElementById('e_text').value);
+        currentV = parseInt(document.getElementById('v_text').value);
+        currentM = parseInt(document.getElementById('m_text').value);
+        updateResult();
+    }
+
+    function calculateManual() {
+        currentE = parseInt(document.getElementById('e_num').value) || 0;
+        currentV = parseInt(document.getElementById('v_num').value) || 0;
+        currentM = parseInt(document.getElementById('m_num').value) || 0;
+        updateResult();
+    }
+
+    function updateResult() {
+        currentTotal = currentE + currentV + currentM;
+        document.getElementById('breakdown').innerText = `E${currentE} V${currentV} M${currentM}`;
+        document.getElementById('totalScore').innerText = currentTotal;
+    }
+
+    function copyResult() {
+        const name = document.getElementById('patientName').value.trim();
+        const nameText = name ? `ชื่อ/เคส: ${name}\n` : '';
+        const textToCopy = `🚨 รายงานผล EVM / GCS 🚨\n${nameText}คะแนนแยก: E${currentE} V${currentV} M${currentM}\nคะแนนรวม: ${currentTotal}/15 คะแนน`;
+
+        navigator.clipboard.writeText(textToCopy).then(() => {
+            const btn = document.getElementById('copyBtn');
+            btn.innerText = "✅ ก๊อปปี้เรียบร้อย!";
+            setTimeout(() => { btn.innerText = "📋 ก๊อปปี้รายงานผล"; }, 2000);
+        });
+    }
+</script>
+
+</body>
+</html>
