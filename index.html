@@ -73,22 +73,6 @@
         h2 { margin-top: 0; color: var(--primary); font-size: 20px; margin-bottom: 16px; font-weight: 800; }
 
         /* Main Hub / Home Screen */
-        .emergency-call {
-            background: linear-gradient(135deg, #ef4444, #b91c1c);
-            color: white;
-            padding: 16px;
-            border-radius: 16px;
-            text-decoration: none;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            gap: 10px;
-            font-size: 18px;
-            font-weight: 800;
-            box-shadow: 0 4px 14px rgba(220,38,38,0.4);
-            margin-bottom: 16px;
-        }
-
         .menu-grid {
             display: grid;
             grid-template-columns: 1fr 1fr;
@@ -196,7 +180,6 @@
 <div id="toastPopup" class="toast-popup"> RescueX พร้อมใช้งาน</div>
 
 <div class="main-container">
-    <!-- Header Navigation -->
     <div class="app-header">
         <button class="tab-btn active" id="tabHomeBtn" onclick="showTab('home')">🏠 หน้าแรก</button>
         <button class="tab-btn" id="tabRRBtn" onclick="showTab('rr')">🫁 RR</button>
@@ -205,13 +188,8 @@
         <button class="tab-btn" id="tabFastBtn" onclick="showTab('fast')">⚡ FAST</button>
     </div>
 
-    <!-- MAIN HUB / HOME TAB -->
     <div id="homeTab" class="card">
-        <h2>โปรดเลือก ฟังชั่นที่ต้องการใช้ </h2>
-        
-        <a href="tel:1669" class="emergency-call">
-            📞 โทรด่วน 1669 (ศูนยเอราวัณ)
-        </a>
+        <h2>โปรดเลือก ฟังก์ชันที่ต้องการใช้</h2>
 
         <div class="menu-grid">
             <div class="menu-card" onclick="showTab('rr')">
@@ -237,7 +215,6 @@
         </div>
     </div>
 
-    <!-- RR COUNTER TAB -->
     <div id="rrTab" class="card" style="display: none;">
         <h2>🫁 อัตราการหายใจ (RR Counter)</h2>
         
@@ -279,7 +256,6 @@
         </div>
     </div>
 
-    <!-- GCS TAB -->
     <div id="gcsTab" class="card" style="display: none;">
         <h2>🧠 EVM / GCS Calculator</h2>
 
@@ -342,7 +318,6 @@
         <button class="btn-copy" id="copyBtn" onclick="copyResult()">📋 ก๊อปปี้รายงานผล GCS</button>
     </div>
 
-    <!-- MOTOR POWER TAB -->
     <div id="mpTab" class="card" style="display: none;">
         <h2>💪 Motor Power Evaluation</h2>
 
@@ -407,7 +382,6 @@
         <button class="btn-copy" id="copyMpBtn" style="background: var(--accent-green);" onclick="copyMpResult()">📋 ก๊อปปี้รายงาน Motor Power</button>
     </div>
 
-    <!-- FAST STROKE TAB -->
     <div id="fastTab" class="card" style="display: none;">
         <h2>⚡ FAST Stroke Screening</h2>
 
