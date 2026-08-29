@@ -7,16 +7,16 @@
     <style>
         * { box-sizing: border-box; font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; }
         body { background-color: #f0f2f5; margin: 0; padding: 12px; display: flex; justify-content: center; position: relative; }
-        .main-container { width: 100%; max-width: 450px; }
+        .main-container { width: 100%; max-width: 480px; }
         
         /* Navigation Tabs Header */
         .app-header {
             display: flex; background: #ffffff; border-radius: 12px; padding: 6px;
-            box-shadow: 0 2px 8px rgba(0,0,0,0.08); margin-bottom: 12px;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.08); margin-bottom: 12px; gap: 4px;
         }
         .tab-btn {
-            flex: 1; padding: 10px 4px; border: none; background: transparent;
-            font-size: 14px; font-weight: bold; color: #5f6368; border-radius: 8px;
+            flex: 1; padding: 10px 2px; border: none; background: transparent;
+            font-size: 12px; font-weight: bold; color: #5f6368; border-radius: 8px;
             cursor: pointer; transition: 0.2s;
         }
         .tab-btn.active { background: #1a73e8; color: white; }
@@ -71,7 +71,7 @@
         .status-slow { background-color: #ffe8cc; color: #d9480f; border: 1px solid #ffd8a8; }
         .status-fast { background-color: #f8d7da; color: #721c24; border: 1px solid #f5c6cb; }
 
-        /* Form Inputs (GCS) */
+        /* Form Inputs (GCS & Motor) */
         label { font-weight: bold; display: block; margin-top: 10px; text-align: left; font-size: 13px; color: #3c4043; }
         select, input[type="text"], input[type="number"] { 
             width: 100%; padding: 10px; margin-top: 4px; border: 1px solid #ccc; border-radius: 8px; box-sizing: border-box; font-size: 14px; 
@@ -79,6 +79,9 @@
         .score { font-size: 22px; font-weight: bold; color: #0275d8; margin-top: 5px; }
         .btn-copy { width: 100%; padding: 12px; background: #0275d8; color: white; border: none; border-radius: 8px; font-size: 16px; font-weight: bold; margin-top: 15px; cursor: pointer; }
         .btn-copy:active { background: #014c8c; }
+
+        /* Motor Power Grid Layout */
+        .mp-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; text-align: left; margin-top: 8px; }
 
         /* Watermark Footer */
         .watermark {
@@ -122,8 +125,9 @@
 
 <div class="main-container">
     <div class="app-header">
-        <button class="tab-btn active" id="tabRRBtn" onclick="showTab('rr')">🫁 นับการหายใจ (RR)</button>
-        <button class="tab-btn" id="tabGCSBtn" onclick="showTab('gcs')">🧠 คำนวณ GCS (EVM)</button>
+        <button class="tab-btn active" id="tabRRBtn" onclick="showTab('rr')">🫁 นับ RR</button>
+        <button class="tab-btn" id="tabGCSBtn" onclick="showTab('gcs')">🧠 คำนวณ GCS</button>
+        <button class="tab-btn" id="tabMPBtn" onclick="showTab('mp')">💪 Motor Power</button>
     </div>
 
     <div id="rrTab" class="card">
@@ -191,6 +195,7 @@
                 <option value="3">E3 - ลืมตาเมื่อเรียก</option>
                 <option value="2">E2 - ลืมตาเมื่อเจ็บ</option>
                 <option value="1">E1 - ไม่ตอบสนอง / ตาไม่เปิด</option>
+                <option value="1-EC">EC - ตาปิดเกร็ง / มีผ้าปิดตา (Score=1)</option>
             </select>
 
             <label>Verbal Response (V - การพูดคุย):</label>
@@ -200,6 +205,8 @@
                 <option value="3">V3 - พูดเป็นคำๆ ไม่เป็นประโยค</option>
                 <option value="2">V2 - ส่งเสียงอืออา ไม่เป็นคำพูด</option>
                 <option value="1">V1 - ไม่ส่งเสียงใดๆ</option>
+                <option value="1-VT">VT - ใส่ท่อเจาะคอ Tracheostomy (Score=1)</option>
+                <option value="1-ETT">ETT - ใส่ท่อช่วยหายใจทางปาก (Score=1)</option>
             </select>
 
             <label>Motor Response (M - การเคลื่อนไหว):</label>
@@ -229,55 +236,105 @@
             <div class="score">คะแนนรวม: <span id="totalScore">15</span> / 15</div>
         </div>
 
-        <button class="btn-copy" id="copyBtn" onclick="copyResult()">📋 ก๊อปปี้รายงานผล</button>
+        <button class="btn-copy" id="copyBtn" onclick="copyResult()">📋 ก๊อปปี้รายงานผล GCS</button>
+    </div>
+
+    <div id="mpTab" class="card" style="display: none;">
+        <h2 style="color: #28a745;">Motor Power Evaluation</h2>
+
+        <div class="mp-grid">
+            <div>
+                <label>แขนขวา (Right Arm):</label>
+                <select id="mp_ra" onchange="updateMotorPower()">
+                    <option value="5">Grade 5 (ปกติ/ต้านแรงเต็มที่)</option>
+                    <option value="4">Grade 4 (ต้านแรงได้บ้าง)</option>
+                    <option value="3">Grade 3 (ยกชนะแรงโน้มถ่วง)</option>
+                    <option value="2">Grade 2 (ขยับราบกับพื้น)</option>
+                    <option value="1">Grade 1 (เกร็งขยับนิดหน่อย)</option>
+                    <option value="0">Grade 0 (ไม่มีการขยับ)</option>
+                </select>
+            </div>
+            <div>
+                <label>แขนซ้าย (Left Arm):</label>
+                <select id="mp_la" onchange="updateMotorPower()">
+                    <option value="5">Grade 5 (ปกติ/ต้านแรงเต็มที่)</option>
+                    <option value="4">Grade 4 (ต้านแรงได้บ้าง)</option>
+                    <option value="3">Grade 3 (ยกชนะแรงโน้มถ่วง)</option>
+                    <option value="2">Grade 2 (ขยับราบกับพื้น)</option>
+                    <option value="1">Grade 1 (เกร็งขยับนิดหน่อย)</option>
+                    <option value="0">Grade 0 (ไม่มีการขยับ)</option>
+                </select>
+            </div>
+            <div>
+                <label>ขาขวา (Right Leg):</label>
+                <select id="mp_rl" onchange="updateMotorPower()">
+                    <option value="5">Grade 5 (ปกติ/ต้านแรงเต็มที่)</option>
+                    <option value="4">Grade 4 (ต้านแรงได้บ้าง)</option>
+                    <option value="3">Grade 3 (ยกชนะแรงโน้มถ่วง)</option>
+                    <option value="2">Grade 2 (ขยับราบกับพื้น)</option>
+                    <option value="1">Grade 1 (เกร็งขยับนิดหน่อย)</option>
+                    <option value="0">Grade 0 (ไม่มีการขยับ)</option>
+                </select>
+            </div>
+            <div>
+                <label>ขาซ้าย (Left Leg):</label>
+                <select id="mp_ll" onchange="updateMotorPower()">
+                    <option value="5">Grade 5 (ปกติ/ต้านแรงเต็มที่)</option>
+                    <option value="4">Grade 4 (ต้านแรงได้บ้าง)</option>
+                    <option value="3">Grade 3 (ยกชนะแรงโน้มถ่วง)</option>
+                    <option value="2">Grade 2 (ขยับราบกับพื้น)</option>
+                    <option value="1">Grade 1 (เกร็งขยับนิดหน่อย)</option>
+                    <option value="0">Grade 0 (ไม่มีการขยับ)</option>
+                </select>
+            </div>
+        </div>
+
+        <div class="result-box" style="margin-top: 15px;">
+            <div class="result-item"><span>แขนขวา (RA):</span><strong id="res_ra">Grade 5</strong></div>
+            <div class="result-item"><span>แขนซ้าย (LA):</span><strong id="res_la">Grade 5</strong></div>
+            <div class="result-item"><span>ขาขวา (RL):</span><strong id="res_rl">Grade 5</strong></div>
+            <div class="result-item"><span>ขาซ้าย (LL):</span><strong id="res_ll">Grade 5</strong></div>
+            <div class="result-item result-main">
+                <span>สรุปผล:</span>
+                <span id="mpSummary" style="font-size: 15px; color: #28a745;">ปกติทุกส่วน (5/5)</span>
+            </div>
+        </div>
+
+        <button class="btn-copy" id="copyMpBtn" style="background: #28a745;" onclick="copyMpResult()">📋 ก๊อปปี้รายงาน Motor Power</button>
     </div>
 
     <div class="watermark">จัดทําเเอพโดย อาสาหน้าใหม่</div>
 </div>
 
 <script>
-    // แสดง Pop-up เด้งแบบนุ่มนวล และจางหายไปเองอัตโนมัติ (2.5 วินาที)
     window.onload = function() {
         const toast = document.getElementById('toastPopup');
         toast.classList.add('show');
-        
-        setTimeout(() => {
-            toast.classList.remove('show');
-        }, 2500);
+        setTimeout(() => { toast.classList.remove('show'); }, 2500);
     };
 
     // --- System Switching Logic ---
     function showTab(tab) {
         document.getElementById('rrTab').style.display = tab === 'rr' ? 'block' : 'none';
         document.getElementById('gcsTab').style.display = tab === 'gcs' ? 'block' : 'none';
+        document.getElementById('mpTab').style.display = tab === 'mp' ? 'block' : 'none';
         
         document.getElementById('tabRRBtn').className = `tab-btn ${tab === 'rr' ? 'active' : ''}`;
         document.getElementById('tabGCSBtn').className = `tab-btn ${tab === 'gcs' ? 'active' : ''}`;
+        document.getElementById('tabMPBtn').className = `tab-btn ${tab === 'mp' ? 'active' : ''}`;
     }
 
     // --- RR Counter Logic ---
-    let count = 0;
-    let selectedTime = 30;
-    let selectedMode = 'adult';
-    let timeLeft = 30.0;
-    let timerInterval = null;
-    let isRunning = false;
-
+    let count = 0, selectedTime = 30, selectedMode = 'adult', timeLeft = 30.0, timerInterval = null, isRunning = false;
     const audioCtx = new (window.AudioContext || window.webkitAudioContext)();
 
     function playSound(freq, duration) {
-        if (audioCtx.state === 'suspended') {
-            audioCtx.resume();
-        }
-        let osc = audioCtx.createOscillator();
-        let gain = audioCtx.createGain();
-        osc.type = 'sine';
-        osc.frequency.value = freq;
+        if (audioCtx.state === 'suspended') audioCtx.resume();
+        let osc = audioCtx.createOscillator(), gain = audioCtx.createGain();
+        osc.type = 'sine'; osc.frequency.value = freq;
         gain.gain.setValueAtTime(0.1, audioCtx.currentTime);
-        osc.connect(gain);
-        gain.connect(audioCtx.destination);
-        osc.start();
-        osc.stop(audioCtx.currentTime + duration);
+        osc.connect(gain); gain.connect(audioCtx.destination);
+        osc.start(); osc.stop(audioCtx.currentTime + duration);
     }
 
     function setMode(mode) {
@@ -291,8 +348,7 @@
 
     function setTimeMode(seconds) {
         if (isRunning) return;
-        selectedTime = seconds;
-        timeLeft = seconds;
+        selectedTime = seconds; timeLeft = seconds;
         document.getElementById('timer').innerText = `${seconds.toFixed(1)}s`;
         document.querySelectorAll('#time15, #time30, #time60').forEach(b => b.classList.remove('active'));
         if(seconds === 15) document.getElementById('time15').classList.add('active');
@@ -306,18 +362,13 @@
         document.getElementById('startBtn').disabled = true;
         document.getElementById('tapBtn').disabled = false;
         
-        let startTime = Date.now();
-        let totalDuration = selectedTime * 1000;
-
+        let startTime = Date.now(), totalDuration = selectedTime * 1000;
         timerInterval = setInterval(() => {
             let elapsed = Date.now() - startTime;
             let remaining = Math.max(0, totalDuration - elapsed);
             timeLeft = (remaining / 1000).toFixed(1);
             document.getElementById('timer').innerText = `${timeLeft}s`;
-
-            if (remaining <= 0) {
-                finishCounting();
-            }
+            if (remaining <= 0) finishCounting();
         }, 100);
     }
 
@@ -342,66 +393,65 @@
         document.getElementById('rawCount').innerText = `${count} ครั้งใน ${selectedTime}s`;
         document.getElementById('calcText').innerText = `${count} × ${multiplier} (x${multiplier} แล้ว)`;
         document.getElementById('finalRR').innerText = `${finalValue} ครั้ง/นาที`;
-
         evaluateRR(finalValue);
     }
 
     function evaluateRR(rr) {
         let alertBox = document.getElementById('statusAlert');
-        alertBox.style.display = "block";
-        alertBox.className = "status-alert";
-
+        alertBox.style.display = "block"; alertBox.className = "status-alert";
         let minNormal = 12, maxNormal = 20;
         if (selectedMode === 'child') { minNormal = 18; maxNormal = 30; }
         else if (selectedMode === 'infant') { minNormal = 30; maxNormal = 50; }
 
         if (rr < minNormal) {
-            alertBox.classList.add("status-slow");
-            alertBox.innerText = "🟠 หายใจช้ากว่าปกติ (Bradypnea)";
+            alertBox.classList.add("status-slow"); alertBox.innerText = "🟠 หายใจช้ากว่าปกติ (Bradypnea)";
         } else if (rr >= minNormal && rr <= maxNormal) {
-            alertBox.classList.add("status-normal");
-            alertBox.innerText = "🟢 อัตราการหายใจปกติ (Normal)";
+            alertBox.classList.add("status-normal"); alertBox.innerText = "🟢 อัตราการหายใจปกติ (Normal)";
         } else {
-            alertBox.classList.add("status-fast");
-            alertBox.innerText = "🔴 หายใจเร็วผิดปกติ / หอบ (Tachypnea)";
+            alertBox.classList.add("status-fast"); alertBox.innerText = "🔴 หายใจเร็วผิดปกติ / หอบ (Tachypnea)";
         }
     }
 
     function resetAll() {
         clearInterval(timerInterval);
-        count = 0;
-        timeLeft = selectedTime;
-        isRunning = false;
-        
+        count = 0; timeLeft = selectedTime; isRunning = false;
         document.getElementById('timer').innerText = `${selectedTime.toFixed(1)}s`;
         document.getElementById('tapCount').innerText = "0";
         document.getElementById('rawCount').innerText = "- ครั้ง";
         document.getElementById('calcText').innerText = "-";
         document.getElementById('finalRR').innerText = "- ครั้ง/นาที";
-        
         document.getElementById('statusAlert').style.display = "none";
         document.getElementById('startBtn').disabled = false;
         document.getElementById('tapBtn').disabled = true;
     }
 
     // --- GCS Logic ---
+    let eLabel = "E4", vLabel = "V5", mLabel = "M6";
     let currentE = 4, currentV = 5, currentM = 6, currentTotal = 15;
 
     function switchGcsMode(mode) {
         document.getElementById('textMode').style.display = mode === 'text' ? 'block' : 'none';
         document.getElementById('manualMode').style.display = mode === 'manual' ? 'block' : 'none';
-        
         document.getElementById('btnText').classList.toggle('active', mode === 'text');
         document.getElementById('btnManual').classList.toggle('active', mode === 'manual');
-        
         if (mode === 'text') calculateText();
         else calculateManual();
     }
 
     function calculateText() {
-        currentE = parseInt(document.getElementById('e_text').value);
-        currentV = parseInt(document.getElementById('v_text').value);
-        currentM = parseInt(document.getElementById('m_text').value);
+        let eVal = document.getElementById('e_text').value;
+        let vVal = document.getElementById('v_text').value;
+        let mVal = document.getElementById('m_text').value;
+
+        currentE = (eVal === '1-EC') ? 1 : parseInt(eVal);
+        eLabel = (eVal === '1-EC') ? 'EC' : `E${currentE}`;
+
+        if (vVal === '1-VT') { currentV = 1; vLabel = 'VT'; }
+        else if (vVal === '1-ETT') { currentV = 1; vLabel = 'ETT'; }
+        else { currentV = parseInt(vVal); vLabel = `V${currentV}`; }
+
+        currentM = parseInt(mVal);
+        mLabel = `M${currentM}`;
         updateResult();
     }
 
@@ -409,24 +459,64 @@
         currentE = parseInt(document.getElementById('e_num').value) || 0;
         currentV = parseInt(document.getElementById('v_num').value) || 0;
         currentM = parseInt(document.getElementById('m_num').value) || 0;
+        eLabel = `E${currentE}`; vLabel = `V${currentV}`; mLabel = `M${currentM}`;
         updateResult();
     }
 
     function updateResult() {
         currentTotal = currentE + currentV + currentM;
-        document.getElementById('breakdown').innerText = `E${currentE} V${currentV} M${currentM}`;
+        document.getElementById('breakdown').innerText = `${eLabel} ${vLabel} ${mLabel}`;
         document.getElementById('totalScore').innerText = currentTotal;
     }
 
     function copyResult() {
         const name = document.getElementById('patientName').value.trim();
         const nameText = name ? `ชื่อ/เคส: ${name}\n` : '';
-        const textToCopy = `🚨 รายงานผล EVM / GCS 🚨\n${nameText}คะแนนแยก: E${currentE} V${currentV} M${currentM}\nคะแนนรวม: ${currentTotal}/15 คะแนน`;
+        const textToCopy = `🚨 รายงานผล EVM / GCS 🚨\n${nameText}คะแนนแยก: ${eLabel} ${vLabel} ${mLabel}\nคะแนนรวม: ${currentTotal}/15 คะแนน`;
 
         navigator.clipboard.writeText(textToCopy).then(() => {
             const btn = document.getElementById('copyBtn');
             btn.innerText = "✅ ก๊อปปี้เรียบร้อย!";
-            setTimeout(() => { btn.innerText = "📋 ก๊อปปี้รายงานผล"; }, 2000);
+            setTimeout(() => { btn.innerText = "📋 ก๊อปปี้รายงานผล GCS"; }, 2000);
+        });
+    }
+
+    // --- Motor Power Logic ---
+    function updateMotorPower() {
+        let ra = document.getElementById('mp_ra').value;
+        let la = document.getElementById('mp_la').value;
+        let rl = document.getElementById('mp_rl').value;
+        let ll = document.getElementById('mp_ll').value;
+
+        document.getElementById('res_ra').innerText = `Grade ${ra}`;
+        document.getElementById('res_la').innerText = `Grade ${la}`;
+        document.getElementById('res_rl').innerText = `Grade ${rl}`;
+        document.getElementById('res_ll').innerText = `Grade ${ll}`;
+
+        let summaryBox = document.getElementById('mpSummary');
+        if (ra === '5' && la === '5' && rl === '5' && ll === '5') {
+            summaryBox.innerText = "ปกติทุกส่วน (5/5)";
+            summaryBox.style.color = "#28a745";
+        } else {
+            summaryBox.innerText = "มีภาวะอ่อนแรง (Motor Weakness)";
+            summaryBox.style.color = "#d9534f";
+        }
+    }
+
+    function copyMpResult() {
+        const name = document.getElementById('patientName').value.trim();
+        const nameText = name ? `ชื่อ/เคส: ${name}\n` : '';
+        let ra = document.getElementById('mp_ra').value;
+        let la = document.getElementById('mp_la').value;
+        let rl = document.getElementById('mp_rl').value;
+        let ll = document.getElementById('mp_ll').value;
+
+        const textToCopy = `💪 รายงานผล Motor Power 💪\n${nameText}RA (แขนขวา): Grade ${ra}\nLA (แขนซ้าย): Grade ${la}\nRL (ขาขวา): Grade ${rl}\nLL (ขาซ้าย): Grade ${ll}`;
+
+        navigator.clipboard.writeText(textToCopy).then(() => {
+            const btn = document.getElementById('copyMpBtn');
+            btn.innerText = "✅ ก๊อปปี้เรียบร้อย!";
+            setTimeout(() => { btn.innerText = "📋 ก๊อปปี้รายงาน Motor Power"; }, 2000);
         });
     }
 </script>
