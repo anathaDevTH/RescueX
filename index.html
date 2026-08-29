@@ -2,104 +2,190 @@
 <html lang="th">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
     <title>Rescue Vital & GCS - เครื่องมือกู้ชีพ BLS</title>
     <style>
-        * { box-sizing: border-box; font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; }
-        body { background-color: #f0f2f5; margin: 0; padding: 12px; display: flex; justify-content: center; position: relative; }
+        :root {
+            --primary: #1e3a8a;
+            --primary-light: #2563eb;
+            --accent-red: #dc2626;
+            --accent-green: #16a34a;
+            --accent-orange: #ea580c;
+            --bg-body: #f1f5f9;
+            --card-bg: #ffffff;
+            --text-dark: #0f172a;
+            --text-muted: #475569;
+            --border: #cbd5e1;
+        }
+
+        * { 
+            box-sizing: border-box; 
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif; 
+            -webkit-tap-highlight-color: transparent;
+        }
+
+        body { 
+            background-color: var(--bg-body); 
+            margin: 0; 
+            padding: 12px; 
+            display: flex; 
+            justify-content: center; 
+            color: var(--text-dark);
+        }
+
         .main-container { width: 100%; max-width: 480px; }
         
-        /* Navigation Tabs Header */
+        /* Navigation Bar */
         .app-header {
-            display: flex; background: #ffffff; border-radius: 12px; padding: 6px;
-            box-shadow: 0 2px 8px rgba(0,0,0,0.08); margin-bottom: 12px; gap: 4px;
+            display: flex; 
+            background: var(--card-bg); 
+            border-radius: 14px; 
+            padding: 6px;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.05); 
+            margin-bottom: 12px; 
+            gap: 4px;
+            overflow-x: auto;
         }
         .tab-btn {
-            flex: 1; padding: 10px 2px; border: none; background: transparent;
-            font-size: 11px; font-weight: bold; color: #5f6368; border-radius: 8px;
-            cursor: pointer; transition: 0.2s;
+            flex: 1; 
+            padding: 12px 6px; 
+            border: none; 
+            background: transparent;
+            font-size: 13px; 
+            font-weight: 700; 
+            color: var(--text-muted); 
+            border-radius: 10px;
+            cursor: pointer; 
+            transition: all 0.2s ease;
+            white-space: nowrap;
         }
-        .tab-btn.active { background: #1a73e8; color: white; }
+        .tab-btn.active { background: var(--primary-light); color: white; box-shadow: 0 2px 6px rgba(37,99,235,0.3); }
 
         /* Card Container */
-        .card { background: white; border-radius: 16px; padding: 18px; box-shadow: 0 4px 12px rgba(0,0,0,0.1); text-align: center; }
-        h2 { margin-top: 0; color: #1a73e8; font-size: 18px; margin-bottom: 15px; }
+        .card { 
+            background: var(--card-bg); 
+            border-radius: 20px; 
+            padding: 20px; 
+            box-shadow: 0 6px 16px rgba(0,0,0,0.06); 
+            text-align: center; 
+            border: 1px solid rgba(255,255,255,0.8);
+        }
+        h2 { margin-top: 0; color: var(--primary); font-size: 20px; margin-bottom: 16px; font-weight: 800; }
 
-        /* Component Styles */
-        .section-label { font-size: 13px; font-weight: bold; color: #5f6368; text-align: left; margin-bottom: 5px; margin-top: 10px; }
+        /* Main Hub / Home Screen */
+        .emergency-call {
+            background: linear-gradient(135deg, #ef4444, #b91c1c);
+            color: white;
+            padding: 16px;
+            border-radius: 16px;
+            text-decoration: none;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 10px;
+            font-size: 18px;
+            font-weight: 800;
+            box-shadow: 0 4px 14px rgba(220,38,38,0.4);
+            margin-bottom: 16px;
+        }
+
+        .menu-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 12px;
+            margin-top: 10px;
+        }
+
+        .menu-card {
+            background: #f8fafc;
+            border: 2px solid #e2e8f0;
+            border-radius: 16px;
+            padding: 20px 12px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+        .menu-card:active { transform: scale(0.96); background: #e2e8f0; }
+        .menu-card .icon { font-size: 36px; margin-bottom: 8px; }
+        .menu-card .title { font-size: 15px; font-weight: 700; color: var(--text-dark); }
+        .menu-card .desc { font-size: 11px; color: var(--text-muted); margin-top: 4px; }
+
+        /* Common Elements */
+        .section-label { font-size: 13px; font-weight: 700; color: var(--text-muted); text-align: left; margin-bottom: 6px; margin-top: 14px; }
         .btn-group { display: flex; gap: 6px; margin-bottom: 12px; }
         .opt-btn { 
-            flex: 1; padding: 8px 4px; font-size: 13px; font-weight: bold; border: 1px solid #dadce0; 
-            background: #f8f9fa; color: #3c4043; border-radius: 8px; cursor: pointer; 
+            flex: 1; padding: 10px 4px; font-size: 13px; font-weight: 700; border: 1px solid var(--border); 
+            background: #f8fafc; color: var(--text-dark); border-radius: 10px; cursor: pointer; 
         }
-        .opt-btn.active { background: #e8f0fe; color: #1a73e8; border-color: #1a73e8; }
+        .opt-btn.active { background: #eff6ff; color: var(--primary-light); border-color: var(--primary-light); font-weight: 800; }
 
-        .timer-display { font-size: 38px; font-weight: bold; color: #d93025; margin: 8px 0; }
+        .timer-display { font-size: 44px; font-weight: 900; color: var(--accent-red); margin: 10px 0; font-family: monospace; }
         
         .start-btn {
-            width: 100%; padding: 14px; font-size: 16px; font-weight: bold; color: white;
-            background: #28a745; border: none; border-radius: 10px; cursor: pointer;
-            box-shadow: 0 4px 6px rgba(0,0,0,0.1); margin-bottom: 10px;
+            width: 100%; padding: 16px; font-size: 18px; font-weight: 800; color: white;
+            background: var(--accent-green); border: none; border-radius: 12px; cursor: pointer;
+            box-shadow: 0 4px 10px rgba(22,163,74,0.3); margin-bottom: 12px;
         }
-        .start-btn:active { background: #218838; transform: scale(0.98); }
-        .start-btn:disabled { background: #a5d6a7; cursor: not-allowed; }
+        .start-btn:active { transform: scale(0.98); }
+        .start-btn:disabled { background: #94a3b8; cursor: not-allowed; box-shadow: none; }
 
         .tap-btn { 
-            width: 100%; height: 100px; font-size: 20px; font-weight: bold; color: white; 
-            background: #1a73e8; border: none; border-radius: 12px; cursor: pointer; 
-            box-shadow: 0 4px 6px rgba(0,0,0,0.15); margin-bottom: 10px; -webkit-tap-highlight-color: transparent;
+            width: 100%; height: 110px; font-size: 22px; font-weight: 800; color: white; 
+            background: var(--primary-light); border: none; border-radius: 16px; cursor: pointer; 
+            box-shadow: 0 4px 12px rgba(37,99,235,0.3); margin-bottom: 12px;
         }
-        .tap-btn:active { background: #1557b0; transform: scale(0.98); }
-        .tap-btn:disabled { background: #e0e0e0; color: #9e9e9e; cursor: not-allowed; box-shadow: none; }
+        .tap-btn:active { background: #1d4ed8; transform: scale(0.98); }
+        .tap-btn:disabled { background: #e2e8f0; color: #94a3b8; cursor: not-allowed; box-shadow: none; }
 
         .reset-btn {
-            background: #f1f3f4; color: #3c4043; border: none; padding: 8px 16px;
-            border-radius: 20px; font-weight: bold; cursor: pointer; margin-bottom: 15px;
+            background: #e2e8f0; color: var(--text-dark); border: none; padding: 10px 20px;
+            border-radius: 20px; font-weight: 700; cursor: pointer; margin-bottom: 15px; font-size: 13px;
         }
 
         .result-box { 
-            background: #f8f9fa; border: 1px solid #dadce0; border-radius: 10px; padding: 12px; margin-top: 10px; text-align: left;
+            background: #f8fafc; border: 1px solid var(--border); border-radius: 12px; padding: 14px; margin-top: 14px; text-align: left;
         }
-        .result-item { display: flex; justify-content: space-between; margin-bottom: 6px; font-size: 14px; color: #3c4043; }
-        .result-main { font-size: 18px; font-weight: bold; color: #1a73e8; border-top: 1px solid #dadce0; padding-top: 8px; margin-top: 8px; }
+        .result-item { display: flex; justify-content: space-between; margin-bottom: 6px; font-size: 14px; color: var(--text-muted); }
+        .result-main { font-size: 18px; font-weight: 800; color: var(--primary-light); border-top: 1px solid var(--border); padding-top: 10px; margin-top: 10px; }
 
         .status-alert {
-            display: none; margin-top: 10px; padding: 10px; border-radius: 8px;
-            font-size: 14px; font-weight: bold; text-align: center;
+            display: none; margin-top: 10px; padding: 12px; border-radius: 10px;
+            font-size: 14px; font-weight: 800; text-align: center;
         }
-        .status-normal { background-color: #d4edda; color: #155724; border: 1px solid #c3e6cb; }
-        .status-slow { background-color: #ffe8cc; color: #d9480f; border: 1px solid #ffd8a8; }
-        .status-fast { background-color: #f8d7da; color: #721c24; border: 1px solid #f5c6cb; }
+        .status-normal { background-color: #dcfce7; color: #15803d; border: 1px solid #bbf7d0; }
+        .status-slow { background-color: #ffedd5; color: #c2410c; border: 1px solid #fed7aa; }
+        .status-fast { background-color: #fee2e2; color: #b91c1c; border: 1px solid #fca5a5; }
 
         /* Form Inputs */
-        label { font-weight: bold; display: block; margin-top: 10px; text-align: left; font-size: 13px; color: #3c4043; }
+        label { font-weight: 700; display: block; margin-top: 12px; text-align: left; font-size: 13px; color: var(--text-dark); }
         select, input[type="text"], input[type="number"], input[type="time"] { 
-            width: 100%; padding: 10px; margin-top: 4px; border: 1px solid #ccc; border-radius: 8px; box-sizing: border-box; font-size: 14px; 
+            width: 100%; padding: 12px; margin-top: 6px; border: 1px solid var(--border); border-radius: 10px; font-size: 15px; background: #fff; font-weight: 600;
         }
-        .score { font-size: 22px; font-weight: bold; color: #0275d8; margin-top: 5px; }
-        .btn-copy { width: 100%; padding: 12px; background: #0275d8; color: white; border: none; border-radius: 8px; font-size: 16px; font-weight: bold; margin-top: 15px; cursor: pointer; }
-        .btn-copy:active { background: #014c8c; }
+        .score { font-size: 24px; font-weight: 900; color: var(--primary-light); margin-top: 6px; }
+        .btn-copy { width: 100%; padding: 14px; background: var(--primary-light); color: white; border: none; border-radius: 12px; font-size: 16px; font-weight: 800; margin-top: 15px; cursor: pointer; box-shadow: 0 4px 10px rgba(37,99,235,0.2); }
+        .btn-copy:active { transform: scale(0.98); }
 
         /* Motor Power Grid Layout */
         .mp-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; text-align: left; margin-top: 8px; }
 
         /* FAST Checklist Item */
         .fast-item {
-            background: #f8f9fa; border: 1px solid #e0e0e0; border-radius: 10px; padding: 10px 12px; margin-bottom: 10px; text-align: left;
+            background: #f8fafc; border: 1px solid var(--border); border-radius: 12px; padding: 12px; margin-bottom: 10px; text-align: left;
         }
-        .fast-title { font-weight: bold; font-size: 14px; color: #d93025; }
-        .fast-desc { font-size: 12px; color: #5f6368; margin-bottom: 6px; }
+        .fast-title { font-weight: 800; font-size: 15px; color: var(--accent-red); }
+        .fast-desc { font-size: 12px; color: var(--text-muted); margin-bottom: 8px; margin-top: 2px; }
 
-        /* Watermark Footer */
         .watermark {
-            text-align: center; margin-top: 15px; font-size: 12px; color: #888888; font-weight: bold; letter-spacing: 0.5px;
+            text-align: center; margin-top: 18px; font-size: 12px; color: #94a3b8; font-weight: 700; letter-spacing: 0.5px;
         }
 
-        /* In-App Toast Popup Style */
         .toast-popup {
             position: fixed; top: 20px; left: 50%; transform: translateX(-50%) translateY(-20px);
-            background: rgba(30, 41, 59, 0.92); color: #ffffff; padding: 12px 24px; border-radius: 25px;
-            font-size: 14px; font-weight: bold; box-shadow: 0 4px 15px rgba(0, 0, 0, 0.2);
+            background: rgba(15, 23, 42, 0.92); color: #ffffff; padding: 10px 20px; border-radius: 20px;
+            font-size: 13px; font-weight: 700; box-shadow: 0 4px 15px rgba(0, 0, 0, 0.2);
             backdrop-filter: blur(5px); z-index: 9999; opacity: 0; pointer-events: none; transition: all 0.4s ease;
         }
         .toast-popup.show { opacity: 1; transform: translateX(-50%) translateY(0); }
@@ -107,18 +193,53 @@
 </head>
 <body>
 
-<div id="toastPopup" class="toast-popup">✨ Made By Arsanamai</div>
+<div id="toastPopup" class="toast-popup">✨ Rescue Vital Pro - พร้อมใช้งาน</div>
 
 <div class="main-container">
+    <!-- Header Navigation -->
     <div class="app-header">
-        <button class="tab-btn active" id="tabRRBtn" onclick="showTab('rr')">🫁 นับ RR</button>
+        <button class="tab-btn active" id="tabHomeBtn" onclick="showTab('home')">🏠 หน้าแรก</button>
+        <button class="tab-btn" id="tabRRBtn" onclick="showTab('rr')">🫁 RR</button>
         <button class="tab-btn" id="tabGCSBtn" onclick="showTab('gcs')">🧠 GCS</button>
         <button class="tab-btn" id="tabMPBtn" onclick="showTab('mp')">💪 Motor</button>
-        <button class="tab-btn" id="tabFastBtn" onclick="showTab('fast')">🧠 FAST Stroke</button>
+        <button class="tab-btn" id="tabFastBtn" onclick="showTab('fast')">⚡ FAST</button>
     </div>
 
-    <div id="rrTab" class="card">
-        <h2>RR Counter Pro - อัตราการหายใจ</h2>
+    <!-- MAIN HUB / HOME TAB -->
+    <div id="homeTab" class="card">
+        <h2>เครื่องมือกู้ชีพ BLS Rapid Tool</h2>
+        
+        <a href="tel:1669" class="emergency-call">
+            📞 โทรด่วน 1669 (ศูนย์สั่งการ)
+        </a>
+
+        <div class="menu-grid">
+            <div class="menu-card" onclick="showTab('rr')">
+                <div class="icon">🫁</div>
+                <div class="title">นับ RR</div>
+                <div class="desc">อัตราการหายใจ</div>
+            </div>
+            <div class="menu-card" onclick="showTab('gcs')">
+                <div class="icon">🧠</div>
+                <div class="title">ประเมิน GCS</div>
+                <div class="desc">EVM Score</div>
+            </div>
+            <div class="menu-card" onclick="showTab('mp')">
+                <div class="icon">💪</div>
+                <div class="title">Motor Power</div>
+                <div class="desc">กำลังแขนขา 4 ข้าง</div>
+            </div>
+            <div class="menu-card" onclick="showTab('fast')">
+                <div class="icon">⚡</div>
+                <div class="title">FAST Stroke</div>
+                <div class="desc">คัดกรองหลอดเลือดสมอง</div>
+            </div>
+        </div>
+    </div>
+
+    <!-- RR COUNTER TAB -->
+    <div id="rrTab" class="card" style="display: none;">
+        <h2>🫁 อัตราการหายใจ (RR Counter)</h2>
         
         <div class="section-label">กลุ่มผู้ป่วย:</div>
         <div class="btn-group">
@@ -139,22 +260,16 @@
         <button class="start-btn" id="startBtn" onclick="startTimer()">▶ เริ่มจับเวลา</button>
 
         <button class="tap-btn" id="tapBtn" onclick="registerTap()" disabled>
-            แตะที่นี่ตามจังหวะหายใจ<br>
-            <span style="font-size: 14px; font-weight: normal;">(นับได้: <span id="tapCount">0</span> ครั้ง)</span>
+            แตะตามจังหวะหายใจ<br>
+            <span style="font-size: 15px; font-weight: normal;">(นับได้: <span id="tapCount" style="font-weight: bold;">0</span> ครั้ง)</span>
         </button>
         <br>
         
         <button class="reset-btn" onclick="resetAll()">↺ รีเซ็ต / เริ่มใหม่</button>
 
         <div class="result-box">
-            <div class="result-item">
-                <span>นับสดได้:</span>
-                <strong id="rawCount">- ครั้ง</strong>
-            </div>
-            <div class="result-item">
-                <span>การคำนวณ:</span>
-                <strong id="calcText">-</strong>
-            </div>
+            <div class="result-item"><span>นับสดได้:</span><strong id="rawCount">- ครั้ง</strong></div>
+            <div class="result-item"><span>การคำนวณ:</span><strong id="calcText">-</strong></div>
             <div class="result-item result-main">
                 <span>อัตราการหายใจ (RR):</span>
                 <span id="finalRR">- ครั้ง/นาที</span>
@@ -164,13 +279,14 @@
         </div>
     </div>
 
+    <!-- GCS TAB -->
     <div id="gcsTab" class="card" style="display: none;">
-        <h2 style="color: #d9534f;">EVM / GCS Calculator</h2>
+        <h2>🧠 EVM / GCS Calculator</h2>
 
         <label>ชื่อผู้ป่วย / รหัสเคส (ถ้ามี):</label>
         <input type="text" id="patientName" placeholder="ระบุชื่อหรือรหัสเคส" oninput="updateResult()">
 
-        <div class="btn-group" style="margin-top: 12px;">
+        <div class="btn-group" style="margin-top: 14px;">
             <button class="opt-btn active" id="btnText" onclick="switchGcsMode('text')">เลือกข้อความ</button>
             <button class="opt-btn" id="btnManual" onclick="switchGcsMode('manual')">กรอกตัวเลข</button>
         </div>
@@ -219,15 +335,16 @@
         </div>
 
         <div class="result-box" style="text-align: center;">
-            <div>ค่าคะแนนแยก: <span id="breakdown" style="font-weight: bold;">E4 V5 M6</span></div>
+            <div>ค่าคะแนนแยก: <span id="breakdown" style="font-weight: bold; color: var(--primary-light);">E4 V5 M6</span></div>
             <div class="score">คะแนนรวม: <span id="totalScore">15</span> / 15</div>
         </div>
 
         <button class="btn-copy" id="copyBtn" onclick="copyResult()">📋 ก๊อปปี้รายงานผล GCS</button>
     </div>
 
+    <!-- MOTOR POWER TAB -->
     <div id="mpTab" class="card" style="display: none;">
-        <h2 style="color: #28a745;">Motor Power Evaluation</h2>
+        <h2>💪 Motor Power Evaluation</h2>
 
         <div class="mp-grid">
             <div>
@@ -283,15 +400,16 @@
             <div class="result-item"><span>ขาซ้าย (LL):</span><strong id="res_ll">Grade 5</strong></div>
             <div class="result-item result-main">
                 <span>สรุปผล:</span>
-                <span id="mpSummary" style="font-size: 15px; color: #28a745;">ปกติทุกส่วน (5/5)</span>
+                <span id="mpSummary" style="font-size: 15px; color: var(--accent-green);">ปกติทุกส่วน (5/5)</span>
             </div>
         </div>
 
-        <button class="btn-copy" id="copyMpBtn" style="background: #28a745;" onclick="copyMpResult()">📋 ก๊อปปี้รายงาน Motor Power</button>
+        <button class="btn-copy" id="copyMpBtn" style="background: var(--accent-green);" onclick="copyMpResult()">📋 ก๊อปปี้รายงาน Motor Power</button>
     </div>
 
+    <!-- FAST STROKE TAB -->
     <div id="fastTab" class="card" style="display: none;">
-        <h2 style="color: #d93025;">FAST Stroke Screening (คัดกรองโรคหลอดเลือดสมอง)</h2>
+        <h2>⚡ FAST Stroke Screening</h2>
 
         <div class="fast-item">
             <div class="fast-title">F - Face Drooping (หน้าเบี้ยว/มุมปากตก)</div>
@@ -327,18 +445,18 @@
         </div>
 
         <div class="result-box">
-            <div class="result-item"><span>ผลคัดกรอง FAST:</span><strong id="fastResultText">ไม่พบอาการสงสัย STROKE</strong></div>
+            <div class="result-item"><span>ผลคัดกรอง FAST:</span><strong id="fastResultText" style="color: var(--accent-green);">ไม่พบอาการสงสัย STROKE</strong></div>
             <div class="result-item"><span>เวลาที่เริ่มมีอาการ (LKN):</span><strong id="fastTimeText">ไม่ได้ระบุ</strong></div>
             <div class="result-item result-main">
                 <span>คำแนะนำ BLS:</span>
-                <span id="fastAction" style="font-size: 14px; color: #28a745;">ประเมินสัญญาณชีพตามปกติ</span>
+                <span id="fastAction" style="font-size: 14px; color: var(--accent-green);">ประเมินสัญญาณชีพตามปกติ</span>
             </div>
         </div>
 
-        <button class="btn-copy" id="copyFastBtn" style="background: #d93025;" onclick="copyFastResult()">🚨 ก๊อปปี้รายงาน</button>
+        <button class="btn-copy" id="copyFastBtn" style="background: var(--accent-red);" onclick="copyFastResult()">🚨 ก๊อปปี้รายงาน FAST</button>
     </div>
 
-    <div class="watermark">จัดทําเเอพโดย อาสาหน้าใหม่</div>
+    <div class="watermark">จัดทำแอปโดย อาสาหน้าใหม่</div>
 </div>
 
 <script>
@@ -350,11 +468,13 @@
 
     // --- System Switching Logic ---
     function showTab(tab) {
+        document.getElementById('homeTab').style.display = tab === 'home' ? 'block' : 'none';
         document.getElementById('rrTab').style.display = tab === 'rr' ? 'block' : 'none';
         document.getElementById('gcsTab').style.display = tab === 'gcs' ? 'block' : 'none';
         document.getElementById('mpTab').style.display = tab === 'mp' ? 'block' : 'none';
         document.getElementById('fastTab').style.display = tab === 'fast' ? 'block' : 'none';
         
+        document.getElementById('tabHomeBtn').className = `tab-btn ${tab === 'home' ? 'active' : ''}`;
         document.getElementById('tabRRBtn').className = `tab-btn ${tab === 'rr' ? 'active' : ''}`;
         document.getElementById('tabGCSBtn').className = `tab-btn ${tab === 'gcs' ? 'active' : ''}`;
         document.getElementById('tabMPBtn').className = `tab-btn ${tab === 'mp' ? 'active' : ''}`;
@@ -366,12 +486,14 @@
     const audioCtx = new (window.AudioContext || window.webkitAudioContext)();
 
     function playSound(freq, duration) {
-        if (audioCtx.state === 'suspended') audioCtx.resume();
-        let osc = audioCtx.createOscillator(), gain = audioCtx.createGain();
-        osc.type = 'sine'; osc.frequency.value = freq;
-        gain.gain.setValueAtTime(0.1, audioCtx.currentTime);
-        osc.connect(gain); gain.connect(audioCtx.destination);
-        osc.start(); osc.stop(audioCtx.currentTime + duration);
+        try {
+            if (audioCtx.state === 'suspended') audioCtx.resume();
+            let osc = audioCtx.createOscillator(), gain = audioCtx.createGain();
+            osc.type = 'sine'; osc.frequency.value = freq;
+            gain.gain.setValueAtTime(0.1, audioCtx.currentTime);
+            osc.connect(gain); gain.connect(audioCtx.destination);
+            osc.start(); osc.stop(audioCtx.currentTime + duration);
+        } catch(e){}
     }
 
     function setMode(mode) {
@@ -533,10 +655,10 @@
         let summaryBox = document.getElementById('mpSummary');
         if (ra === '5' && la === '5' && rl === '5' && ll === '5') {
             summaryBox.innerText = "ปกติทุกส่วน (5/5)";
-            summaryBox.style.color = "#28a745";
+            summaryBox.style.color = "var(--accent-green)";
         } else {
             summaryBox.innerText = "มีภาวะอ่อนแรง (Motor Weakness)";
-            summaryBox.style.color = "#d9534f";
+            summaryBox.style.color = "var(--accent-red)";
         }
     }
 
@@ -574,14 +696,14 @@
 
         if (hasPositive) {
             resBox.innerText = "🚨 สงสัย STROKE (Fast positive)";
-            resBox.style.color = "#d93025";
+            resBox.style.color = "var(--accent-red)";
             actionBox.innerText = "⚡ แจ้ง 1669/ศูนย์สั่งการ Stroke Fast Track ด่วน!";
-            actionBox.style.color = "#d93025";
+            actionBox.style.color = "var(--accent-red)";
         } else {
             resBox.innerText = "ปกติ (Fast negative)";
-            resBox.style.color = "#28a745";
+            resBox.style.color = "var(--accent-green)";
             actionBox.innerText = "ประเมินสัญญาณชีพตามปกติ";
-            actionBox.style.color = "#28a745";
+            actionBox.style.color = "var(--accent-green)";
         }
     }
 
