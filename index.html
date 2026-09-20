@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>RescueX</title>
+    <title>RescueX - EMS Tool & Scenario Simulator</title>
     <style>
         :root {
             --primary: #1e3a8a;
@@ -11,11 +11,14 @@
             --accent-red: #dc2626;
             --accent-green: #16a34a;
             --accent-orange: #ea580c;
-            --bg-body: #f1f5f9;
-            --card-bg: #ffffff;
-            --text-dark: #0f172a;
-            --text-muted: #475569;
-            --border: #cbd5e1;
+            --accent-yellow: #ca8a04;
+            --bg-body: #0f172a;
+            --card-bg: #1e293b;
+            --card-inner: #0f172a;
+            --text-dark: #f8fafc;
+            --text-muted: #94a3b8;
+            --border: #334155;
+            --monitor-bg: #030712;
         }
 
         * { 
@@ -41,17 +44,19 @@
             background: var(--card-bg); 
             border-radius: 14px; 
             padding: 6px;
-            box-shadow: 0 4px 12px rgba(0,0,0,0.05); 
+            box-shadow: 0 4px 12px rgba(0,0,0,0.3); 
             margin-bottom: 12px; 
             gap: 4px;
             overflow-x: auto;
+            border: 1px solid var(--border);
         }
+        .app-header::-webkit-scrollbar { display: none; }
         .tab-btn {
             flex: 1; 
-            padding: 12px 6px; 
+            padding: 10px 8px; 
             border: none; 
             background: transparent;
-            font-size: 13px; 
+            font-size: 12px; 
             font-weight: 700; 
             color: var(--text-muted); 
             border-radius: 10px;
@@ -59,32 +64,32 @@
             transition: all 0.2s ease;
             white-space: nowrap;
         }
-        .tab-btn.active { background: var(--primary-light); color: white; box-shadow: 0 2px 6px rgba(37,99,235,0.3); }
+        .tab-btn.active { background: var(--primary-light); color: white; box-shadow: 0 2px 8px rgba(37,99,235,0.4); }
 
         /* Card Container */
         .card { 
             background: var(--card-bg); 
             border-radius: 20px; 
-            padding: 20px; 
-            box-shadow: 0 6px 16px rgba(0,0,0,0.06); 
+            padding: 16px; 
+            box-shadow: 0 6px 16px rgba(0,0,0,0.4); 
             text-align: center; 
-            border: 1px solid rgba(255,255,255,0.8);
+            border: 1px solid var(--border);
         }
-        h2 { margin-top: 0; color: var(--primary); font-size: 20px; margin-bottom: 16px; font-weight: 800; }
+        h2 { margin-top: 0; color: #60a5fa; font-size: 18px; margin-bottom: 14px; font-weight: 800; display: flex; align-items: center; justify-content: center; gap: 6px; }
 
         /* Main Hub / Home Screen */
         .menu-grid {
             display: grid;
             grid-template-columns: 1fr 1fr;
-            gap: 12px;
+            gap: 10px;
             margin-top: 10px;
         }
 
         .menu-card {
-            background: #f8fafc;
-            border: 2px solid #e2e8f0;
+            background: var(--card-inner);
+            border: 1px solid var(--border);
             border-radius: 16px;
-            padding: 20px 12px;
+            padding: 16px 10px;
             display: flex;
             flex-direction: column;
             align-items: center;
@@ -92,84 +97,123 @@
             cursor: pointer;
             transition: all 0.2s;
         }
-        .menu-card:active { transform: scale(0.96); background: #e2e8f0; }
-        .menu-card .icon { font-size: 36px; margin-bottom: 8px; }
-        .menu-card .title { font-size: 15px; font-weight: 700; color: var(--text-dark); }
-        .menu-card .desc { font-size: 11px; color: var(--text-muted); margin-top: 4px; }
+        .menu-card:active { transform: scale(0.96); background: #1e293b; }
+        .menu-card .icon { font-size: 32px; margin-bottom: 6px; }
+        .menu-card .title { font-size: 14px; font-weight: 700; color: #f8fafc; }
+        .menu-card .desc { font-size: 11px; color: var(--text-muted); margin-top: 2px; }
+        .menu-card.highlight { border-color: var(--accent-red); background: rgba(220, 38, 38, 0.1); }
 
         /* Common Elements */
-        .section-label { font-size: 13px; font-weight: 700; color: var(--text-muted); text-align: left; margin-bottom: 6px; margin-top: 14px; }
-        .btn-group { display: flex; gap: 6px; margin-bottom: 12px; }
+        .section-label { font-size: 12px; font-weight: 700; color: var(--text-muted); text-align: left; margin-bottom: 6px; margin-top: 12px; }
+        .btn-group { display: flex; gap: 6px; margin-bottom: 10px; }
         .opt-btn { 
-            flex: 1; padding: 10px 4px; font-size: 13px; font-weight: 700; border: 1px solid var(--border); 
-            background: #f8fafc; color: var(--text-dark); border-radius: 10px; cursor: pointer; 
+            flex: 1; padding: 10px 4px; font-size: 12px; font-weight: 700; border: 1px solid var(--border); 
+            background: var(--card-inner); color: var(--text-dark); border-radius: 10px; cursor: pointer; 
         }
-        .opt-btn.active { background: #eff6ff; color: var(--primary-light); border-color: var(--primary-light); font-weight: 800; }
+        .opt-btn.active { background: var(--primary-light); color: #fff; border-color: var(--primary-light); }
 
-        .timer-display { font-size: 44px; font-weight: 900; color: var(--accent-red); margin: 10px 0; font-family: monospace; }
+        .timer-display { font-size: 40px; font-weight: 900; color: var(--accent-red); margin: 8px 0; font-family: monospace; }
         
         .start-btn {
-            width: 100%; padding: 16px; font-size: 18px; font-weight: 800; color: white;
+            width: 100%; padding: 14px; font-size: 16px; font-weight: 800; color: white;
             background: var(--accent-green); border: none; border-radius: 12px; cursor: pointer;
-            box-shadow: 0 4px 10px rgba(22,163,74,0.3); margin-bottom: 12px;
+            box-shadow: 0 4px 10px rgba(22,163,74,0.3); margin-bottom: 10px;
         }
         .start-btn:active { transform: scale(0.98); }
-        .start-btn:disabled { background: #94a3b8; cursor: not-allowed; box-shadow: none; }
+        .start-btn:disabled { background: #475569; cursor: not-allowed; box-shadow: none; }
 
         .tap-btn { 
-            width: 100%; height: 110px; font-size: 22px; font-weight: 800; color: white; 
+            width: 100%; height: 90px; font-size: 20px; font-weight: 800; color: white; 
             background: var(--primary-light); border: none; border-radius: 16px; cursor: pointer; 
-            box-shadow: 0 4px 12px rgba(37,99,235,0.3); margin-bottom: 12px;
+            box-shadow: 0 4px 12px rgba(37,99,235,0.3); margin-bottom: 10px;
         }
         .tap-btn:active { background: #1d4ed8; transform: scale(0.98); }
-        .tap-btn:disabled { background: #e2e8f0; color: #94a3b8; cursor: not-allowed; box-shadow: none; }
+        .tap-btn:disabled { background: #334155; color: #64748b; cursor: not-allowed; box-shadow: none; }
 
         .reset-btn {
-            background: #e2e8f0; color: var(--text-dark); border: none; padding: 10px 20px;
-            border-radius: 20px; font-weight: 700; cursor: pointer; margin-bottom: 15px; font-size: 13px;
+            background: #334155; color: var(--text-dark); border: none; padding: 8px 16px;
+            border-radius: 20px; font-weight: 700; cursor: pointer; margin-bottom: 10px; font-size: 12px;
         }
 
         .result-box { 
-            background: #f8fafc; border: 1px solid var(--border); border-radius: 12px; padding: 14px; margin-top: 14px; text-align: left;
+            background: var(--card-inner); border: 1px solid var(--border); border-radius: 12px; padding: 12px; margin-top: 10px; text-align: left;
         }
-        .result-item { display: flex; justify-content: space-between; margin-bottom: 6px; font-size: 14px; color: var(--text-muted); }
-        .result-main { font-size: 18px; font-weight: 800; color: var(--primary-light); border-top: 1px solid var(--border); padding-top: 10px; margin-top: 10px; }
+        .result-item { display: flex; justify-content: space-between; margin-bottom: 6px; font-size: 13px; color: var(--text-muted); }
+        .result-main { font-size: 16px; font-weight: 800; color: #60a5fa; border-top: 1px solid var(--border); padding-top: 8px; margin-top: 8px; }
 
         .status-alert {
-            display: none; margin-top: 10px; padding: 12px; border-radius: 10px;
-            font-size: 14px; font-weight: 800; text-align: center;
+            display: none; margin-top: 10px; padding: 10px; border-radius: 10px;
+            font-size: 13px; font-weight: 800; text-align: center;
         }
-        .status-normal { background-color: #dcfce7; color: #15803d; border: 1px solid #bbf7d0; }
-        .status-slow { background-color: #ffedd5; color: #c2410c; border: 1px solid #fed7aa; }
-        .status-fast { background-color: #fee2e2; color: #b91c1c; border: 1px solid #fca5a5; }
+        .status-normal { background-color: rgba(22, 163, 74, 0.2); color: #4ade80; border: 1px solid #16a34a; }
+        .status-slow { background-color: rgba(234, 88, 12, 0.2); color: #fb923c; border: 1px solid #ea580c; }
+        .status-fast { background-color: rgba(220, 38, 38, 0.2); color: #f87171; border: 1px solid #dc2626; }
 
-        /* Form Inputs */
-        label { font-weight: 700; display: block; margin-top: 12px; text-align: left; font-size: 13px; color: var(--text-dark); }
+        /* Inputs */
+        label { font-weight: 700; display: block; margin-top: 10px; text-align: left; font-size: 12px; color: #cbd5e1; }
         select, input[type="text"], input[type="number"], input[type="time"] { 
-            width: 100%; padding: 12px; margin-top: 6px; border: 1px solid var(--border); border-radius: 10px; font-size: 15px; background: #fff; font-weight: 600;
+            width: 100%; padding: 10px; margin-top: 4px; border: 1px solid var(--border); border-radius: 10px; font-size: 14px; background: var(--card-inner); color: white; font-weight: 600;
         }
-        .score { font-size: 24px; font-weight: 900; color: var(--primary-light); margin-top: 6px; }
-        .btn-copy { width: 100%; padding: 14px; background: var(--primary-light); color: white; border: none; border-radius: 12px; font-size: 16px; font-weight: 800; margin-top: 15px; cursor: pointer; box-shadow: 0 4px 10px rgba(37,99,235,0.2); }
+        .score { font-size: 22px; font-weight: 900; color: #60a5fa; margin-top: 4px; }
+        .btn-copy { width: 100%; padding: 12px; background: var(--primary-light); color: white; border: none; border-radius: 12px; font-size: 15px; font-weight: 800; margin-top: 12px; cursor: pointer; box-shadow: 0 4px 10px rgba(37,99,235,0.2); }
         .btn-copy:active { transform: scale(0.98); }
 
-        /* Motor Power Grid Layout */
-        .mp-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; text-align: left; margin-top: 8px; }
+        .mp-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; text-align: left; margin-top: 6px; }
 
-        /* FAST Checklist Item */
         .fast-item {
-            background: #f8fafc; border: 1px solid var(--border); border-radius: 12px; padding: 12px; margin-bottom: 10px; text-align: left;
+            background: var(--card-inner); border: 1px solid var(--border); border-radius: 12px; padding: 10px; margin-bottom: 8px; text-align: left;
         }
-        .fast-title { font-weight: 800; font-size: 15px; color: var(--accent-red); }
-        .fast-desc { font-size: 12px; color: var(--text-muted); margin-bottom: 8px; margin-top: 2px; }
+        .fast-title { font-weight: 800; font-size: 14px; color: #f87171; }
+        .fast-desc { font-size: 11px; color: var(--text-muted); margin-bottom: 6px; margin-top: 2px; }
+
+        /* --- SCENARIO STYLES --- */
+        .scen-selector { display: flex; flex-direction: column; gap: 8px; }
+        .scen-card {
+            background: var(--card-inner); border: 1px solid var(--border); border-radius: 12px; padding: 12px; text-align: left; cursor: pointer; transition: 0.2s;
+        }
+        .scen-card:active { transform: scale(0.98); border-color: var(--primary-light); }
+        .scen-tag { display: inline-block; padding: 2px 8px; border-radius: 6px; font-size: 10px; font-weight: 800; margin-bottom: 4px; }
+        .tag-trauma { background: #991b1b; color: #fecaca; }
+        .tag-medical { background: #1e40af; color: #bfdbfe; }
+        .tag-endo { background: #854d0e; color: #fef08a; }
+
+        /* Vital Monitor Screen */
+        .vital-monitor {
+            background: var(--monitor-bg); border: 2px solid #334155; border-radius: 14px; padding: 10px; margin: 10px 0; display: grid; grid-template-columns: repeat(3, 1fr); gap: 6px;
+        }
+        .vital-box { background: rgba(255,255,255,0.03); border-radius: 8px; padding: 6px; text-align: center; }
+        .vital-lbl { font-size: 10px; font-weight: 700; color: #64748b; }
+        .vital-val { font-size: 18px; font-weight: 900; font-family: monospace; margin-top: 2px; }
+        .val-hr { color: #22c55e; }
+        .val-spo2 { color: #06b6d4; }
+        .val-bp { color: #eab308; }
+        .val-rr { color: #a855f7; }
+        .val-gcs { color: #3b82f6; }
+        .val-dtx { color: #f97316; }
+
+        .patient-box {
+            background: #1e293b; border-left: 4px solid var(--primary-light); border-radius: 8px; padding: 10px; text-align: left; font-size: 13px; margin-bottom: 10px;
+        }
+
+        .action-grid { display: grid; grid-template-columns: repeat(2, 1fr); gap: 6px; margin-top: 8px; }
+        .action-btn {
+            background: #334155; border: 1px solid #475569; color: white; padding: 10px 6px; border-radius: 10px; font-size: 12px; font-weight: 700; cursor: pointer; text-align: center; display: flex; align-items: center; justify-content: center; gap: 4px;
+        }
+        .action-btn:active { transform: scale(0.96); background: var(--primary-light); }
+        .action-btn.done { background: #065f46; border-color: #059669; color: #a7f3d0; }
+
+        .log-box {
+            background: #020617; border: 1px solid var(--border); border-radius: 10px; padding: 8px; height: 90px; overflow-y: auto; text-align: left; font-size: 11px; color: #94a3b8; font-family: monospace; margin-top: 10px;
+        }
 
         .watermark {
-            text-align: center; margin-top: 18px; font-size: 12px; color: #94a3b8; font-weight: 700; letter-spacing: 0.5px;
+            text-align: center; margin-top: 16px; font-size: 11px; color: #64748b; font-weight: 700; letter-spacing: 0.5px;
         }
 
         .toast-popup {
-            position: fixed; top: 20px; left: 50%; transform: translateX(-50%) translateY(-20px);
-            background: rgba(15, 23, 42, 0.92); color: #ffffff; padding: 10px 20px; border-radius: 20px;
-            font-size: 13px; font-weight: 700; box-shadow: 0 4px 15px rgba(0, 0, 0, 0.2);
+            position: fixed; top: 16px; left: 50%; transform: translateX(-50%) translateY(-20px);
+            background: rgba(15, 23, 42, 0.95); border: 1px solid var(--border); color: #ffffff; padding: 10px 18px; border-radius: 20px;
+            font-size: 12px; font-weight: 700; box-shadow: 0 4px 15px rgba(0, 0, 0, 0.5);
             backdrop-filter: blur(5px); z-index: 9999; opacity: 0; pointer-events: none; transition: all 0.4s ease;
         }
         .toast-popup.show { opacity: 1; transform: translateX(-50%) translateY(0); }
@@ -177,21 +221,28 @@
 </head>
 <body>
 
-<div id="toastPopup" class="toast-popup"> RescueX พร้อมใช้งาน</div>
+<div id="toastPopup" class="toast-popup">🚒 RescueX พร้อมปฏิบัติการ</div>
 
 <div class="main-container">
     <div class="app-header">
         <button class="tab-btn active" id="tabHomeBtn" onclick="showTab('home')">🏠 หน้าแรก</button>
+        <button class="tab-btn" id="tabScenBtn" onclick="showTab('scen')">🎮 สถานการณ์</button>
         <button class="tab-btn" id="tabRRBtn" onclick="showTab('rr')">🫁 RR</button>
         <button class="tab-btn" id="tabGCSBtn" onclick="showTab('gcs')">🧠 GCS</button>
         <button class="tab-btn" id="tabMPBtn" onclick="showTab('mp')">💪 Motor</button>
         <button class="tab-btn" id="tabFastBtn" onclick="showTab('fast')">⚡ FAST</button>
     </div>
 
+    <!-- HOME TAB -->
     <div id="homeTab" class="card">
-        <h2>โปรดเลือก ฟังก์ชันที่ต้องการใช้</h2>
+        <h2>🚒 RescueX Emergency Tools</h2>
 
         <div class="menu-grid">
+            <div class="menu-card highlight" onclick="showTab('scen')">
+                <div class="icon">🎮</div>
+                <div class="title">ซ้อมสถานการณ์</div>
+                <div class="desc">Scenario EMS จำลองเคส</div>
+            </div>
             <div class="menu-card" onclick="showTab('rr')">
                 <div class="icon">🫁</div>
                 <div class="title">นับ RR</div>
@@ -200,21 +251,78 @@
             <div class="menu-card" onclick="showTab('gcs')">
                 <div class="icon">🧠</div>
                 <div class="title">ประเมิน GCS</div>
-                <div class="desc">EVM Score</div>
+                <div class="desc">EVM Score Calculator</div>
             </div>
             <div class="menu-card" onclick="showTab('mp')">
                 <div class="icon">💪</div>
                 <div class="title">Motor Power</div>
                 <div class="desc">กำลังแขนขา 4 ข้าง</div>
             </div>
-            <div class="menu-card" onclick="showTab('fast')">
+            <div class="menu-card" onclick="showTab('fast')" style="grid-column: span 2;">
                 <div class="icon">⚡</div>
-                <div class="title">FAST Stroke</div>
-                <div class="desc">คัดกรองหลอดเลือดสมอง</div>
+                <div class="title">FAST Stroke Screening</div>
+                <div class="desc">คัดกรองโรคหลอดเลือดสมอง</div>
             </div>
         </div>
     </div>
 
+    <!-- SCENARIO TAB -->
+    <div id="scenTab" class="card" style="display: none;">
+        <h2>🎮 EMS Scenario Simulator</h2>
+
+        <!-- Selection Screen -->
+        <div id="scenSelectScreen">
+            <div class="section-label">เลือกสถานการณ์ที่ต้องการฝึก:</div>
+            <div class="scen-selector">
+                <div class="scen-card" onclick="startScenario(1)">
+                    <span class="scen-tag tag-trauma">TRAUMA / อุบัติเหตุ</span>
+                    <div style="font-weight: 800; font-size: 14px; color: #f8fafc;">มอเตอร์ไซค์ล้ม ขาซ้ายหักผิดรูป</div>
+                    <div style="font-size: 11px; color: #94a3b8; margin-top: 2px;">ผู้ป่วยชาย 25 ปี มีแผลเปิด Bleeding และขาซ้ายผิดรูป</div>
+                </div>
+
+                <div class="scen-card" onclick="startScenario(2)">
+                    <span class="scen-tag tag-medical">MEDICAL / เจ็บป่วย</span>
+                    <div style="font-weight: 800; font-size: 14px; color: #f8fafc;">แน่นหน้าอก เหงื่อออก สงสัย STEMI</div>
+                    <div style="font-size: 11px; color: #94a3b8; margin-top: 2px;">ผู้ป่วยชาย 58 ปี แน่นร้าวไปไหล่ซ้าย หายใจลำบาก</div>
+                </div>
+
+                <div class="scen-card" onclick="startScenario(3)">
+                    <span class="scen-tag tag-endo">ENDOCRINE / เบาหวาน</span>
+                    <div style="font-size: 14px; font-weight: 800; color: #f8fafc;">หมดสติ ซึม ตัวเย็น (Hypoglycemia)</div>
+                    <div style="font-size: 11px; color: #94a3b8; margin-top: 2px;">ผู้ป่วยหญิง 65 ปี ปลูกไม่ค่อยตื่น เหงื่อท่วมตัว</div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Gameplay Screen -->
+        <div id="scenPlayScreen" style="display: none;">
+            <div class="patient-box" id="scenDesc">รับแจ้งเหตุ...</div>
+
+            <!-- Vital Monitor -->
+            <div class="vital-monitor">
+                <div class="vital-box"><div class="vital-lbl">HR (bpm)</div><div class="vital-val val-hr" id="v_hr">--</div></div>
+                <div class="vital-box"><div class="vital-lbl">SpO2 (%)</div><div class="vital-val val-spo2" id="v_spo2">--</div></div>
+                <div class="vital-box"><div class="vital-lbl">BP (mmHg)</div><div class="vital-val val-bp" id="v_bp">--/--</div></div>
+                <div class="vital-box"><div class="vital-lbl">RR (/min)</div><div class="vital-val val-rr" id="v_rr">--</div></div>
+                <div class="vital-box"><div class="vital-lbl">GCS</div><div class="vital-val val-gcs" id="v_gcs">--</div></div>
+                <div class="vital-box"><div class="vital-lbl">DTX (mg/dL)</div><div class="vital-val val-dtx" id="v_dtx">--</div></div>
+            </div>
+
+            <div class="section-label">เลือกอุปกรณ์ / การปฐมพยาบาล:</div>
+            <div class="action-grid" id="actionBtnContainer">
+                <!-- Action Buttons will be rendered here -->
+            </div>
+
+            <div class="log-box" id="scenLog">--- เริ่มต้นการปฏิบัติการ ---</div>
+
+            <div style="display: flex; gap: 8px; margin-top: 10px;">
+                <button class="reset-btn" style="flex: 1; margin: 0;" onclick="quitScenario()">↩ ออก</button>
+                <button class="start-btn" style="flex: 2; margin: 0; background: var(--accent-red);" onclick="finishScenario()">🚑 ส่งโรงพยาบาล</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- RR TAB -->
     <div id="rrTab" class="card" style="display: none;">
         <h2>🫁 อัตราการหายใจ (RR Counter)</h2>
         
@@ -233,36 +341,33 @@
         </div>
 
         <div class="timer-display" id="timer">30.0s</div>
-        
         <button class="start-btn" id="startBtn" onclick="startTimer()">▶ เริ่มจับเวลา</button>
-
         <button class="tap-btn" id="tapBtn" onclick="registerTap()" disabled>
             แตะตามจังหวะหายใจ<br>
-            <span style="font-size: 15px; font-weight: normal;">(นับได้: <span id="tapCount" style="font-weight: bold;">0</span> ครั้ง)</span>
+            <span style="font-size: 13px; font-weight: normal;">(นับได้: <span id="tapCount" style="font-weight: bold;">0</span> ครั้ง)</span>
         </button>
         <br>
-        
         <button class="reset-btn" onclick="resetAll()">↺ รีเซ็ต / เริ่มใหม่</button>
 
         <div class="result-box">
-            <div class="result-item"><span>นับสดได้:</span><strong id="rawCount">- ครั้ง</strong></div>
-            <div class="result-item"><span>การคำนวณ:</span><strong id="calcText">-</strong></div>
+            <div class="result-item"><span>นับสดได้:</span><strong id="rawCount" style="color:white;">- ครั้ง</strong></div>
+            <div class="result-item"><span>การคำนวณ:</span><strong id="calcText" style="color:white;">-</strong></div>
             <div class="result-item result-main">
                 <span>อัตราการหายใจ (RR):</span>
                 <span id="finalRR">- ครั้ง/นาที</span>
             </div>
-
             <div id="statusAlert" class="status-alert"></div>
         </div>
     </div>
 
+    <!-- GCS TAB -->
     <div id="gcsTab" class="card" style="display: none;">
         <h2>🧠 EVM / GCS Calculator</h2>
 
         <label>ชื่อผู้ป่วย / รหัสเคส (ถ้ามี):</label>
         <input type="text" id="patientName" placeholder="ระบุชื่อหรือรหัสเคส" oninput="updateResult()">
 
-        <div class="btn-group" style="margin-top: 14px;">
+        <div class="btn-group" style="margin-top: 12px;">
             <button class="opt-btn active" id="btnText" onclick="switchGcsMode('text')">เลือกข้อความ</button>
             <button class="opt-btn" id="btnManual" onclick="switchGcsMode('manual')">กรอกตัวเลข</button>
         </div>
@@ -302,22 +407,21 @@
         <div id="manualMode" style="display: none;">
             <label>E Score (1-4):</label>
             <input type="number" id="e_num" min="1" max="4" value="4" oninput="calculateManual()">
-
             <label>V Score (1-5):</label>
             <input type="number" id="v_num" min="1" max="5" value="5" oninput="calculateManual()">
-
             <label>M Score (1-6):</label>
             <input type="number" id="m_num" min="1" max="6" value="6" oninput="calculateManual()">
         </div>
 
         <div class="result-box" style="text-align: center;">
-            <div>ค่าคะแนนแยก: <span id="breakdown" style="font-weight: bold; color: var(--primary-light);">E4 V5 M6</span></div>
+            <div>ค่าคะแนนแยก: <span id="breakdown" style="font-weight: bold; color: #60a5fa;">E4 V5 M6</span></div>
             <div class="score">คะแนนรวม: <span id="totalScore">15</span> / 15</div>
         </div>
 
         <button class="btn-copy" id="copyBtn" onclick="copyResult()">📋 ก๊อปปี้รายงานผล GCS</button>
     </div>
 
+    <!-- MOTOR POWER TAB -->
     <div id="mpTab" class="card" style="display: none;">
         <h2>💪 Motor Power Evaluation</h2>
 
@@ -325,69 +429,70 @@
             <div>
                 <label>แขนขวา (Right Arm):</label>
                 <select id="mp_ra" onchange="updateMotorPower()">
-                    <option value="5">Grade 5 (ปกติ/ต้านแรงเต็มที่)</option>
+                    <option value="5">Grade 5 (ปกติ)</option>
                     <option value="4">Grade 4 (ต้านแรงได้บ้าง)</option>
                     <option value="3">Grade 3 (ยกชนะแรงโน้มถ่วง)</option>
-                    <option value="2">Grade 2 (ขยับราบกับพื้น)</option>
-                    <option value="1">Grade 1 (เกร็งขยับนิดหน่อย)</option>
-                    <option value="0">Grade 0 (ไม่มีการขยับ)</option>
+                    <option value="2">Grade 2 (ขยับราบพื้น)</option>
+                    <option value="1">Grade 1 (เกร็งนิดหน่อย)</option>
+                    <option value="0">Grade 0 (ไม่ขยับ)</option>
                 </select>
             </div>
             <div>
                 <label>แขนซ้าย (Left Arm):</label>
                 <select id="mp_la" onchange="updateMotorPower()">
-                    <option value="5">Grade 5 (ปกติ/ต้านแรงเต็มที่)</option>
+                    <option value="5">Grade 5 (ปกติ)</option>
                     <option value="4">Grade 4 (ต้านแรงได้บ้าง)</option>
                     <option value="3">Grade 3 (ยกชนะแรงโน้มถ่วง)</option>
-                    <option value="2">Grade 2 (ขยับราบกับพื้น)</option>
-                    <option value="1">Grade 1 (เกร็งขยับนิดหน่อย)</option>
-                    <option value="0">Grade 0 (ไม่มีการขยับ)</option>
+                    <option value="2">Grade 2 (ขยับราบพื้น)</option>
+                    <option value="1">Grade 1 (เกร็งนิดหน่อย)</option>
+                    <option value="0">Grade 0 (ไม่ขยับ)</option>
                 </select>
             </div>
             <div>
                 <label>ขาขวา (Right Leg):</label>
                 <select id="mp_rl" onchange="updateMotorPower()">
-                    <option value="5">Grade 5 (ปกติ/ต้านแรงเต็มที่)</option>
+                    <option value="5">Grade 5 (ปกติ)</option>
                     <option value="4">Grade 4 (ต้านแรงได้บ้าง)</option>
                     <option value="3">Grade 3 (ยกชนะแรงโน้มถ่วง)</option>
-                    <option value="2">Grade 2 (ขยับราบกับพื้น)</option>
-                    <option value="1">Grade 1 (เกร็งขยับนิดหน่อย)</option>
-                    <option value="0">Grade 0 (ไม่มีการขยับ)</option>
+                    <option value="2">Grade 2 (ขยับราบพื้น)</option>
+                    <option value="1">Grade 1 (เกร็งนิดหน่อย)</option>
+                    <option value="0">Grade 0 (ไม่ขยับ)</option>
                 </select>
             </div>
             <div>
                 <label>ขาซ้าย (Left Leg):</label>
                 <select id="mp_ll" onchange="updateMotorPower()">
-                    <option value="5">Grade 5 (ปกติ/ต้านแรงเต็มที่)</option>
+                    <option value="5">Grade 5 (ปกติ)</option>
                     <option value="4">Grade 4 (ต้านแรงได้บ้าง)</option>
                     <option value="3">Grade 3 (ยกชนะแรงโน้มถ่วง)</option>
-                    <option value="2">Grade 2 (ขยับราบกับพื้น)</option>
-                    <option value="1">Grade 1 (เกร็งขยับนิดหน่อย)</option>
-                    <option value="0">Grade 0 (ไม่มีการขยับ)</option>
+                    <option value="2">Grade 2 (ขยับราบพื้น)</option>
+                    <option value="1">Grade 1 (เกร็งนิดหน่อย)</option>
+                    <option value="0">Grade 0 (ไม่ขยับ)</option>
                 </select>
             </div>
         </div>
 
-        <div class="result-box" style="margin-top: 15px;">
-            <div class="result-item"><span>แขนขวา (RA):</span><strong id="res_ra">Grade 5</strong></div>
-            <div class="result-item"><span>แขนซ้าย (LA):</span><strong id="res_la">Grade 5</strong></div>
-            <div class="result-item"><span>ขาขวา (RL):</span><strong id="res_rl">Grade 5</strong></div>
-            <div class="result-item"><span>ขาซ้าย (LL):</span><strong id="res_ll">Grade 5</strong></div>
+        <div class="result-box" style="margin-top: 12px;">
+            <div class="result-item"><span>แขนขวา (RA):</span><strong id="res_ra" style="color:white;">Grade 5</strong></div>
+            <div class="result-item"><span>แขนซ้าย (LA):</span><strong id="res_la" style="color:white;">Grade 5</strong></div>
+            <div class="result-item"><span>ขาขวา (RL):</span><strong id="res_rl" style="color:white;">Grade 5</strong></div>
+            <div class="result-item"><span>ขาซ้าย (LL):</span><strong id="res_ll" style="color:white;">Grade 5</strong></div>
             <div class="result-item result-main">
                 <span>สรุปผล:</span>
-                <span id="mpSummary" style="font-size: 15px; color: var(--accent-green);">ปกติทุกส่วน (5/5)</span>
+                <span id="mpSummary" style="font-size: 14px; color: #4ade80;">ปกติทุกส่วน (5/5)</span>
             </div>
         </div>
 
         <button class="btn-copy" id="copyMpBtn" style="background: var(--accent-green);" onclick="copyMpResult()">📋 ก๊อปปี้รายงาน Motor Power</button>
     </div>
 
+    <!-- FAST TAB -->
     <div id="fastTab" class="card" style="display: none;">
         <h2>⚡ FAST Stroke Screening</h2>
 
         <div class="fast-item">
             <div class="fast-title">F - Face Drooping (หน้าเบี้ยว/มุมปากตก)</div>
-            <div class="fast-desc">ยิ้มแล้วมุมปากตก ตากระตุก หรือหน้าเบี้ยวครึ่งซีก</div>
+            <div class="fast-desc">ยิ้มแล้วมุมปากตก หรือหน้าเบี้ยวครึ่งซีก</div>
             <select id="fast_f" onchange="updateFastScreen()">
                 <option value="0">🟢 ปกติ (No Drooping)</option>
                 <option value="1">🔴 ผิดปกติ (มีอาการหน้าเบี้ยว/มุมปากตก)</option>
@@ -396,41 +501,40 @@
 
         <div class="fast-item">
             <div class="fast-title">A - Arm Weakness (แขนขาอ่อนแรง)</div>
-            <div class="fast-desc">ยกแขนสองข้างขึ้น 10 วินาที แล้วมีข้างใดข้างหนึ่งตก</div>
+            <div class="fast-desc">ยกแขนสองข้างขึ้น 10 วินาที แล้วตก 1 ข้าง</div>
             <select id="fast_a" onchange="updateFastScreen()">
                 <option value="0">🟢 ปกติ (No Weakness)</option>
-                <option value="1">🔴 ผิดปกติ (แขนขาอ่อนแรงข้างใดข้างหนึ่ง)</option>
+                <option value="1">🔴 ผิดปกติ (แขนขาอ่อนแรง)</option>
             </select>
         </div>
 
         <div class="fast-item">
-            <div class="fast-title">S - Speech Difficulty (พูดไม่ชัด/พูดไม่ได้)</div>
-            <div class="fast-desc">พูดอ้อแอ้ พูดไม่เป็นคำ นึกคำพูดไม่ออก หรือฟังไม่เข้าใจ</div>
+            <div class="fast-title">S - Speech Difficulty (พูดไม่ชัด/ไม่พูด)</div>
+            <div class="fast-desc">พูดอ้อแอ้ หรือฟังไม่เข้าใจ</div>
             <select id="fast_s" onchange="updateFastScreen()">
                 <option value="0">🟢 ปกติ (Speech Normal)</option>
-                <option value="1">🔴 ผิดปกติ (พูดไม่ชัด/สับสน/พูดไม่ได้)</option>
+                <option value="1">🔴 ผิดปกติ (พูดไม่ชัด/สับสน)</option>
             </select>
         </div>
 
         <div class="fast-item">
-            <div class="fast-title">T - Time (เวลาเริ่มมีอาการ - Last Known Normal)</div>
-            <div class="fast-desc">ระบุเวลาที่เริ่มมีอาการ หรือเวลาสุดท้ายที่เห็นว่าปกติ</div>
+            <div class="fast-title">T - Time (เวลาเริ่มมีอาการ)</div>
             <input type="time" id="fast_t" onchange="updateFastScreen()">
         </div>
 
         <div class="result-box">
-            <div class="result-item"><span>ผลคัดกรอง FAST:</span><strong id="fastResultText" style="color: var(--accent-green);">ไม่พบอาการสงสัย STROKE</strong></div>
-            <div class="result-item"><span>เวลาที่เริ่มมีอาการ (LKN):</span><strong id="fastTimeText">ไม่ได้ระบุ</strong></div>
+            <div class="result-item"><span>ผลคัดกรอง:</span><strong id="fastResultText" style="color: #4ade80;">ไม่พบอาการสงสัย STROKE</strong></div>
+            <div class="result-item"><span>เวลาที่มีอาการ (LKN):</span><strong id="fastTimeText" style="color:white;">ไม่ได้ระบุ</strong></div>
             <div class="result-item result-main">
                 <span>คำแนะนำ BLS:</span>
-                <span id="fastAction" style="font-size: 14px; color: var(--accent-green);">ประเมินสัญญาณชีพตามปกติ</span>
+                <span id="fastAction" style="font-size: 13px; color: #4ade80;">ประเมินสัญญาณชีพตามปกติ</span>
             </div>
         </div>
 
         <button class="btn-copy" id="copyFastBtn" style="background: var(--accent-red);" onclick="copyFastResult()">🚨 ก๊อปปี้รายงาน FAST</button>
     </div>
 
-    <div class="watermark">จัดทำแอปโดย อาสาหน้าใหม่</div>
+    <div class="watermark">RescueX Emergency System v2.0</div>
 </div>
 
 <script>
@@ -440,22 +544,151 @@
         setTimeout(() => { toast.classList.remove('show'); }, 2500);
     };
 
-    // --- System Switching Logic ---
+    // --- Navigation ---
     function showTab(tab) {
         document.getElementById('homeTab').style.display = tab === 'home' ? 'block' : 'none';
+        document.getElementById('scenTab').style.display = tab === 'scen' ? 'block' : 'none';
         document.getElementById('rrTab').style.display = tab === 'rr' ? 'block' : 'none';
         document.getElementById('gcsTab').style.display = tab === 'gcs' ? 'block' : 'none';
         document.getElementById('mpTab').style.display = tab === 'mp' ? 'block' : 'none';
         document.getElementById('fastTab').style.display = tab === 'fast' ? 'block' : 'none';
         
-        document.getElementById('tabHomeBtn').className = `tab-btn ${tab === 'home' ? 'active' : ''}`;
-        document.getElementById('tabRRBtn').className = `tab-btn ${tab === 'rr' ? 'active' : ''}`;
-        document.getElementById('tabGCSBtn').className = `tab-btn ${tab === 'gcs' ? 'active' : ''}`;
-        document.getElementById('tabMPBtn').className = `tab-btn ${tab === 'mp' ? 'active' : ''}`;
-        document.getElementById('tabFastBtn').className = `tab-btn ${tab === 'fast' ? 'active' : ''}`;
+        document.querySelectorAll('.tab-btn').forEach(btn => btn.classList.remove('active'));
+        if(tab === 'home') document.getElementById('tabHomeBtn').classList.add('active');
+        if(tab === 'scen') document.getElementById('tabScenBtn').classList.add('active');
+        if(tab === 'rr') document.getElementById('tabRRBtn').classList.add('active');
+        if(tab === 'gcs') document.getElementById('tabGCSBtn').classList.add('active');
+        if(tab === 'mp') document.getElementById('tabMPBtn').classList.add('active');
+        if(tab === 'fast') document.getElementById('tabFastBtn').classList.add('active');
     }
 
-    // --- RR Counter Logic ---
+    // --- SCENARIO LOGIC ---
+    let currentScen = 0;
+    let scenActionsDone = [];
+
+    const scenarios = {
+        1: {
+            title: "อุบัติเหตุ มอเตอร์ไซค์ล้ม ขาซ้ายหักผิดรูป",
+            desc: "🚨 รับแจ้งมอเตอร์ไซค์ชนป้ายข้างทาง ผู้ป่วยชาย 25 ปี นอนร้องโอดครวญ ขาซ้ายผิดรูป มีแผลเปิด Bleeding ที่หน้าแข้ง",
+            vitals: { hr: 110, spo2: 96, bp: "110/70", rr: 24, gcs: 15, dtx: 105 },
+            actions: [
+                { id: "pulse", label: "📈 วัด Pulse Oximeter", log: "ติด Pulse Oximeter: ค่า SpO2 = 96%, HR = 110 bpm" },
+                { id: "bp", label: "🩺 วัดความดัน BP", log: "วัดความดันได้ 110/70 mmHg" },
+                { id: "collar", label: "🦴 ใส่ C-Collar", log: "ใส่ C-Collar ประคองกระดูกคอเรียบร้อย" },
+                { id: "bandage", label: "🩹 ปิดแผลห้ามเลือด (EB)", log: "ใช้ผ้าก๊อซและ Elastic Bandage พันห้ามเลือดที่ขาซ้าย" },
+                { id: "splint", label: "🪵 ดามขา (Rigid Splint)", log: "เอาไม้ดามดามขาซ้าย ยึดข้อบนและข้อล่างเรียบร้อย" },
+                { id: "lsb", label: "🛹 ขึ้นกระดาน LSB", log: "Log roll และยึดตัวผู้ป่วยบน Long Spinal Board พร้อมสายรัด" }
+            ],
+            checkScore: () => {
+                let score = 0;
+                if(scenActionsDone.includes("collar")) score += 25;
+                if(scenActionsDone.includes("bandage")) score += 25;
+                if(scenActionsDone.includes("splint")) score += 25;
+                if(scenActionsDone.includes("lsb")) score += 25;
+                return { score, feedback: score === 100 ? "ยอดเยี่ยม! ดามขา ป้องกันคอ และยึด LSB ได้ถูกต้องตามมาตรฐาน BLS Trauma" : "ควรเน้นการดามขาและเซฟกระดูกคอให้ครบถ้วนก่อนเคลื่อนย้าย" };
+            }
+        },
+        2: {
+            title: "ผู้ป่วยแน่นหน้าอก เหงื่อออก สงสัย STEMI",
+            desc: "🚨 ชาย 58 ปี แน่นหน้าอกปวดร้าวไปไหล่ซ้าย เป็นมา 30 นาที เหงื่อแตก ตัวเย็น หายใจติดขัด",
+            vitals: { hr: 98, spo2: 91, bp: "145/90", rr: 22, gcs: 15, dtx: 130 },
+            actions: [
+                { id: "ox", label: "🌬️ ให้ O2 Cannula/Mask", log: "ให้ออกซิเจน Mask with Bag 10 LPM -> ค่า SpO2 ขึ้นเป็น 99%", effect: () => { updateVital('spo2', 99); } },
+                { id: "pulse", label: "📈 วัด Pulse Oximeter", log: "ติด Pulse Oximeter: SpO2 = 91%, HR = 98 bpm" },
+                { id: "bp", label: "🩺 วัด BP ทั้ง 2 ข้าง", log: "BP ข้างขวา 145/90 mmHg, ข้างซ้าย 142/88 mmHg" },
+                { id: "ekg", label: "⚡ ติดสายประเมิน EKG", log: "พบ ST-elevation สงสัยภาวะกล้ามเนื้อหัวใจขาดเลือดด่วน!" },
+                { id: "semi", label: "🛏️ จัดท่านอนศีรษะสูง", log: "จัดท่านอน Semi-Fowler's position เพื่อให้หายใจสะดวกขึ้น" }
+            ],
+            checkScore: () => {
+                let score = 0;
+                if(scenActionsDone.includes("ox")) score += 40;
+                if(scenActionsDone.includes("ekg")) score += 30;
+                if(scenActionsDone.includes("semi")) score += 30;
+                return { score, feedback: score >= 70 ? "ดีมาก! ให้ O2 เพิ่ม Sat และรีบประเมินหัวใจเพื่อนำส่งโรงพยาบาลที่มีศูนย์หัวใจ" : "ผู้ป่วย SpO2 ต่ำ ต้องรีบให้ออกซิเจนและจัดท่านอนศีรษะสูง" };
+            }
+        },
+        3: {
+            title: "ผู้ป่วยซึม หมดสติ ตัวเย็น (Hypoglycemia)",
+            desc: "🚨 หญิง 65 ปี มีประวัติเบาหวาน ญาติพบว่าปลุกไม่ค่อยตื่น เรียกตอบสนองช้า เหงื่อท่วมตัว",
+            vitals: { hr: 105, spo2: 95, bp: "100/60", rr: 18, gcs: 10, dtx: 38 },
+            actions: [
+                { id: "dtx", label: "🩸 เจาะวัด DTX (น้ำตาล)", log: "เจาะน้ำตาลปลายนิ้ว DTX = 38 mg/dL (ภาวะน้ำตาลในเลือดต่ำขั้นรุนแรง!)" },
+                { id: "gcs", label: "🧠 ประเมิน GCS", log: "ประเมิน GCS ได้ E3 V3 M4 = 10 คะแนน" },
+                { id: "airway", label: "🫁 จัดท่าเปิดทางเดินหายใจ", log: "จัดท่า Head Tilt-Chin Lift ป้องกันลิ้นตกอุดทางเดินหายใจ" },
+                { id: "ox", label: "🌬️ ให้ O2 Cannula", log: "ให้ Oxygen Cannula 3 LPM พยุงการหายใจ" }
+            ],
+            checkScore: () => {
+                let score = 0;
+                if(scenActionsDone.includes("dtx")) score += 50;
+                if(scenActionsDone.includes("airway")) score += 50;
+                return { score, feedback: score === 100 ? "ถูกต้อง! ตรวจพบ Hypoglycemia ได้รวดเร็วและดูแลทางเดินหายใจได้ปลอดภัย" : "เคสซึมเบาหวาน สิ่งสำคัญที่สุดคือการเจาะ DTX วัดระดับน้ำตาล" };
+            }
+        }
+    };
+
+    function startScenario(scenId) {
+        currentScen = scenId;
+        scenActionsDone = [];
+        let data = scenarios[scenId];
+
+        document.getElementById('scenSelectScreen').style.display = 'none';
+        document.getElementById('scenPlayScreen').style.display = 'block';
+
+        document.getElementById('scenDesc').innerText = data.desc;
+        document.getElementById('scenLog').innerText = `[00:00] เริ่มต้นเคส: ${data.title}\n`;
+
+        // Load Vitals
+        updateVital('hr', data.vitals.hr);
+        updateVital('spo2', data.vitals.spo2);
+        updateVital('bp', data.vitals.bp);
+        updateVital('rr', data.vitals.rr);
+        updateVital('gcs', data.vitals.gcs);
+        updateVital('dtx', data.vitals.dtx);
+
+        // Render Action Buttons
+        let container = document.getElementById('actionBtnContainer');
+        container.innerHTML = '';
+        data.actions.forEach(act => {
+            let btn = document.createElement('button');
+            btn.className = 'action-btn';
+            btn.id = `btn_act_${act.id}`;
+            btn.innerText = act.label;
+            btn.onclick = () => doAction(act);
+            container.appendChild(btn);
+        });
+    }
+
+    function doAction(act) {
+        if (scenActionsDone.includes(act.id)) return;
+        scenActionsDone.push(act.id);
+
+        let btn = document.getElementById(`btn_act_${act.id}`);
+        btn.classList.add('done');
+        btn.innerText = "✓ " + btn.innerText;
+
+        let logBox = document.getElementById('scenLog');
+        logBox.innerText += `> ${act.log}\n`;
+        logBox.scrollTop = logBox.scrollHeight;
+
+        if (act.effect) act.effect();
+    }
+
+    function updateVital(id, val) {
+        document.getElementById(`v_${id}`).innerText = val;
+    }
+
+    function finishScenario() {
+        let result = scenarios[currentScen].checkScore();
+        alert(`🚑 สรุปผลการส่งโรงพยาบาล:\n\nคะแนนปฏิบัติการ: ${result.score}/100\n\nคำแนะนำ: ${result.feedback}`);
+        quitScenario();
+    }
+
+    function quitScenario() {
+        document.getElementById('scenSelectScreen').style.display = 'block';
+        document.getElementById('scenPlayScreen').style.display = 'none';
+    }
+
+    // --- RR COUNTER LOGIC ---
     let count = 0, selectedTime = 30, selectedMode = 'adult', timeLeft = 30.0, timerInterval = null, isRunning = false;
     const audioCtx = new (window.AudioContext || window.webkitAudioContext)();
 
@@ -524,7 +757,7 @@
         let finalValue = count * multiplier;
         
         document.getElementById('rawCount').innerText = `${count} ครั้งใน ${selectedTime}s`;
-        document.getElementById('calcText').innerText = `${count} × ${multiplier} (x${multiplier} แล้ว)`;
+        document.getElementById('calcText').innerText = `${count} × ${multiplier} (x${multiplier})`;
         document.getElementById('finalRR').innerText = `${finalValue} ครั้ง/นาที`;
         evaluateRR(finalValue);
     }
@@ -558,7 +791,7 @@
         document.getElementById('tapBtn').disabled = true;
     }
 
-    // --- GCS Logic ---
+    // --- GCS LOGIC ---
     let eLabel = "E4", vLabel = "V5", mLabel = "M6";
     let currentE = 4, currentV = 5, currentM = 6, currentTotal = 15;
 
@@ -614,7 +847,7 @@
         });
     }
 
-    // --- Motor Power Logic ---
+    // --- MOTOR POWER LOGIC ---
     function updateMotorPower() {
         let ra = document.getElementById('mp_ra').value;
         let la = document.getElementById('mp_la').value;
@@ -629,10 +862,10 @@
         let summaryBox = document.getElementById('mpSummary');
         if (ra === '5' && la === '5' && rl === '5' && ll === '5') {
             summaryBox.innerText = "ปกติทุกส่วน (5/5)";
-            summaryBox.style.color = "var(--accent-green)";
+            summaryBox.style.color = "#4ade80";
         } else {
             summaryBox.innerText = "มีภาวะอ่อนแรง (Motor Weakness)";
-            summaryBox.style.color = "var(--accent-red)";
+            summaryBox.style.color = "#f87171";
         }
     }
 
@@ -653,7 +886,7 @@
         });
     }
 
-    // --- FAST Stroke Screening Logic ---
+    // --- FAST STROKE LOGIC ---
     function updateFastScreen() {
         let f = document.getElementById('fast_f').value;
         let a = document.getElementById('fast_a').value;
@@ -670,14 +903,14 @@
 
         if (hasPositive) {
             resBox.innerText = "🚨 สงสัย STROKE (Fast positive)";
-            resBox.style.color = "var(--accent-red)";
+            resBox.style.color = "#f87171";
             actionBox.innerText = "⚡ แจ้ง 1669/ศูนย์สั่งการ Stroke Fast Track ด่วน!";
-            actionBox.style.color = "var(--accent-red)";
+            actionBox.style.color = "#f87171";
         } else {
             resBox.innerText = "ปกติ (Fast negative)";
-            resBox.style.color = "var(--accent-green)";
+            resBox.style.color = "#4ade80";
             actionBox.innerText = "ประเมินสัญญาณชีพตามปกติ";
-            actionBox.style.color = "var(--accent-green)";
+            actionBox.style.color = "#4ade80";
         }
     }
 
@@ -685,20 +918,20 @@
         const name = document.getElementById('patientName').value.trim();
         const nameText = name ? `ชื่อ/เคส: ${name}\n` : '';
         
-        let f = document.getElementById('fast_f').value === '1' ? '🔴 ผิดปกติ (หน้าเบี้ยว)' : '🟢 ปกติ';
-        let a = document.getElementById('fast_a').value === '1' ? '🔴 ผิดปกติ (แขนขาอ่อนแรง)' : '🟢 ปกติ';
-        let s = document.getElementById('fast_s').value === '1' ? '🔴 ผิดปกติ (พูดไม่ชัด/ไม่พูด)' : '🟢 ปกติ';
+        let f = document.getElementById('fast_f').value === '1' ? '🔴 ผิดปกติ' : '🟢 ปกติ';
+        let a = document.getElementById('fast_a').value === '1' ? '🔴 ผิดปกติ' : '🟢 ปกติ';
+        let s = document.getElementById('fast_s').value === '1' ? '🔴 ผิดปกติ' : '🟢 ปกติ';
         let t = document.getElementById('fast_t').value || 'ไม่ระบุ';
 
         let isPositive = (document.getElementById('fast_f').value === '1' || document.getElementById('fast_a').value === '1' || document.getElementById('fast_s').value === '1');
-        let statusTag = isPositive ? '🚨 [STROKE ALERT / FAST POSITIVE] 🚨' : '🟢 [FAST NEGATIVE]';
+        let statusTag = isPositive ? '🚨 [STROKE ALERT / FAST POSITIVE]' : '🟢 [FAST NEGATIVE]';
 
-        const textToCopy = `${statusTag}\n${nameText}• F (Face): ${f}\n• A (Arm): ${a}\n• S (Speech): ${s}\n• T (Onset Time): ${t} น.`;
+        const textToCopy = `${statusTag}\n${nameText}• F (Face): ${f}\n• A (Arm): ${a}\n• S (Speech): ${s}\n• T (Onset): ${t} น.`;
 
         navigator.clipboard.writeText(textToCopy).then(() => {
             const btn = document.getElementById('copyFastBtn');
-            btn.innerText = "✅ ก๊อปปี้รายงานเรียบร้อย!";
-            setTimeout(() => { btn.innerText = "🚨 ก๊อปปี้รายงาน"; }, 2000);
+            btn.innerText = "✅ ก๊อปปี้เรียบร้อย!";
+            setTimeout(() => { btn.innerText = "🚨 ก๊อปปี้รายงาน FAST"; }, 2000);
         });
     }
 </script>
